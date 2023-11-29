@@ -26,6 +26,16 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "importlib"
+version = "1.0.4"
+description = "Backport of importlib.import_module() from Python 2.7"
+optional = false
+python-versions = "*"
+files = [
+    {file = "importlib-1.0.4.zip", hash = "sha256:b6ee7066fea66e35f8d0acee24d98006de1a0a8a94a8ce6efe73a9a23c8d9826"},
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -114,4 +124,4 @@ url = "website"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7f937857ced4da7db710a72e080dd3f9f742591472b42395c2eb4ab57bb645ba"
+content-hash = "975216b8d62938fd2d47d8c6a2d11f1f6ab78db0e012c70dc6cfea95dd6701f8"

@@ -1,3 +1,6 @@
-from website.main import hello
+from website import __version__
 
-hello()
+
+def test_version():
+    assert __version__ == "0.1.0"
+    print(f"Version {__version__} is correct.")
