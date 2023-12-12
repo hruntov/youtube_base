@@ -1,0 +1,20 @@
+name: Django CI/CD for youtube_base
+on:
+  push:
+    branches: [ "main", "youtube_base" ]
+  pull_request:
+    branches: [ "main", "youtube_base" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v3
+    - name: Install dependencies
+      run: pip install flake8
+    - name: Test with flake8
+      run: |
+        cd website_wsl/youtube_base && python -m flake8
+    - name: Build and run containers
+      run: |
+        cd website_wsl/youtube_base && docker-compose up -d --build
