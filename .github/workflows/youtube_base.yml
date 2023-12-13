@@ -1,6 +1,9 @@
 name: CI
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: pull_request
+on:
+  push:
+    branches:
+      - '*'
 
 jobs:
   run_pytest:
