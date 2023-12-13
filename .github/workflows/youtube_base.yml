@@ -1,15 +1,15 @@
 name: CI
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: pull_request
 
 jobs:
-  ci:
+  run_pytest:
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
-        poetry-version: ["1.7.1"]
-        os: [ubuntu-18.04]
-    runs-on: ${{ matrix.os }}
+        poetry-version: ["1.1.12"]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
