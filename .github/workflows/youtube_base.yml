@@ -1,29 +1,23 @@
-name: GitHub Actions for YoutubeBase
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [pull_request]
+name: CI
+on: pull_request
+
 jobs:
-  run_unittests:
-    runs-on: ubuntu-latest
+  ci:
     strategy:
-      max-parallel: 4
+      fail-fast: false
       matrix:
-        python-version: ['3.10']
+        python-version: ["3.10"]
+        poetry-version: ["1.7.1"]
+        os: [ubuntu-18.04]
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Dependencies
-        run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
-          source $HOME/.poetry/env
-          poetry install
-          poetry shell
-        env:
-          POETRY_HOME: $HOME/.poetry
-          PATH: ${{ env.POETRY_HOME }}/bin:${{ env.PATH }}
-      - name: Run Tests
-        run: |
-          python3 manage.py test
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Run pytest
+        run: poetry run pytest -v
