@@ -29,6 +29,8 @@ jobs:
       - name: Start Django server
         run: |
           poetry run python youtube_base/manage.py runserver & sleep 10
+      - name: Run migrations
+        run: poetry run python youtube_base/manage.py migrate
       - name: Run pytest
         run: |
           poetry run pytest -v
