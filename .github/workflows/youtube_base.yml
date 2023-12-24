@@ -25,4 +25,10 @@ jobs:
       - name: Poetry install
         run: poetry install
       - name: Run pytest
-        run: poetry run pytest -v
+        run: |
+          poetry run pytest -v
+          if [ $? -ne 0 ]; then
+            echo "Tests failed. Aborting push."
+            exit 1
+          fi
+          
