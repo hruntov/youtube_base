@@ -22,16 +22,8 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: Setup Chrome Driver
-        uses: nanasess/setup-chromedriver@master
-      - name: Install Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
-          sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
-          sudo echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get -y update
-          sudo apt-get -y install google-chrome-stable
+      - uses: browser-actions/setup-chrome@latest
+      - run: chrome --version
       - name: Poetry install
         run: poetry install
       - name: Run pytest
