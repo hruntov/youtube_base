@@ -1,11 +1,14 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import unittest
 
 
 class BasicInstallTest(unittest.TestCase):
 
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        options = Options()
+        options.add_argument("--headless")
+        self.browser = webdriver.Chrome(options=options)
 
     def tearDown(self):
         self.browser.quit()
