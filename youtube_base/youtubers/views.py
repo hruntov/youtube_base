@@ -11,3 +11,10 @@ class TestTemplateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['all_data'] = models.TestModel.objects.all()
         return context
+
+
+class HomeView(TemplateView):
+    template_name = "youtubers/home.html"
+
+    def home(request):
+        return render(request, 'youtubers/home.html')
