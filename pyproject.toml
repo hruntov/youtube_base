@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "root"
+name = "youtube_base"
 version = "0.1.0"
 description = ""
 authors = ["Kostiantyn"]
