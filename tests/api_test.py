@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from website.add_youtuber import YoutubeApi
+from youtube_api.add_youtuber import YoutubeApi
 
 
 class TestYoutubeApi(unittest.TestCase):

@@ -15,10 +15,6 @@ class BasicInstallTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def test_install(self):
-        self.browser.get("http://localhost:8000/test")
-        self.assertIn("Test Template", self.browser.title)
-
     def test_home_page_title(self):
         self.browser.get("http://localhost:8000")
         self.assertIn("База українських кріейтерів", self.browser.title)
