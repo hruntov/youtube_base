@@ -1,19 +1,25 @@
 [tool.poetry]
-name = "youtube_base"
+name = "root"
 version = "0.1.0"
 description = ""
 authors = ["Kostiantyn"]
 readme = "README.md"
+packages = [
+    { include = "youtube_api/" },
+    { include = "youtube_base" },
+    { include = "tests" },
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
-website = {path = "./website/"}
 importlib = "^1.0.4"
 django = "^5.0"
 flake8 = "^6.1.0"
 selenium = "^4.16.0"
 google-api-python-client = "^2.111.0"
 isort = "^5.13.2"
+pytest = "^7.4.4"
 
 [build-system]
 requires = ["poetry-core"]
