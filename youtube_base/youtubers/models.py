@@ -18,6 +18,8 @@ class Youtuber(models.Model):
         instagram: The URL of the Youtuber's Instagram page.
         facebook: The URL of the Youtuber's Facebook page.
         slug_name: The slugified version of the Youtuber's username.
+        categories: The categories that the Youtuber belongs to. This is a many-to-many field
+            referencing the Category model.
 
     """
     id = models.AutoField(primary_key=True)
@@ -33,6 +35,7 @@ class Youtuber(models.Model):
     instagram = models.CharField(max_length=100, blank=True, null=True)
     facebook = models.CharField(max_length=100, blank=True, null=True)
     slug_name = models.SlugField(max_length=100, blank=True, null=True)
+    categories = models.ManyToManyField('Category', related_name='youtubers')
 
 
 class Video(models.Model):
@@ -42,8 +45,7 @@ class Video(models.Model):
         id: The primary key of the Video.
         title  The title of the video.
         url: The URL of the video.
-        youtuber: The Youtuber who posted the video. This is a foreign key referencing the Youtuber model.
-        slug_name: The slugified version of the video's title.
+        youtuber: The Youtuber who posted the video. This is a foreign key referencing the Youtuber model.        slug_name: The slugified version of the video's title.
 
     """
     id = models.AutoField(primary_key=True)
@@ -51,3 +53,18 @@ class Video(models.Model):
     url = models.CharField(max_length=255)
     youtuber = models.ForeignKey('Youtuber', on_delete=models.CASCADE, related_name='videos')
     slug_name = models.SlugField(max_length=255, blank=True, null=True)
+
+
+class Category(models.Model):
+    """
+    The CategoryYoutuber model represents a category that a Youtuber can belong to.
+
+    Attributes:
+        id: The primary key of the Category.
+        name: The name of the category.
+        description: A description of the category.
+
+    """
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
