@@ -11,7 +11,7 @@ class YoutubeApi:
     channel_url = ''
 
     #: (str): The custom name of the channel.
-    username = ''
+    channel_username = ''
 
     #: (str): The identifier of the channel.
     channel_id = ''

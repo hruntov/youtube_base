@@ -12,11 +12,11 @@ class Youtuber(models.Model):
         channel_description: The description of the YouTube channel.
         created_at: The date and time when the Youtuber was added.
         updated_at: The date and time when the Youtuber was last updated.
-        youtube: The URL of the YouTube channel.
-        twitch: The URL of the Youtuber's Twitch channel.
-        telegram: The URL of the Youtuber's Telegram channel.
-        instagram: The URL of the Youtuber's Instagram page.
-        facebook: The URL of the Youtuber's Facebook page.
+        youtube_url: The URL of the YouTube channel.
+        twitch_url: The URL of the Youtuber's Twitch channel.
+        telegram_url: The URL of the Youtuber's Telegram channel.
+        instagram_url: The URL of the Youtuber's Instagram page.
+        facebook_url: The URL of the Youtuber's Facebook page.
         slug_name: The slugified version of the Youtuber's username.
         categories: The categories that the Youtuber belongs to. This is a many-to-many field
             referencing the Category model.
@@ -29,11 +29,11 @@ class Youtuber(models.Model):
     channel_description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    youtube = models.CharField(max_length=100, blank=True, null=True)
-    twitch = models.CharField(max_length=100, blank=True, null=True)
-    telegram = models.CharField(max_length=100, blank=True, null=True)
-    instagram = models.CharField(max_length=100, blank=True, null=True)
-    facebook = models.CharField(max_length=100, blank=True, null=True)
+    youtube_url = models.CharField(max_length=100, blank=True, null=True)
+    twitch_url = models.CharField(max_length=100, blank=True, null=True)
+    telegram_url = models.CharField(max_length=100, blank=True, null=True)
+    instagram_url = models.CharField(max_length=100, blank=True, null=True)
+    facebook_url = models.CharField(max_length=100, blank=True, null=True)
     slug_name = models.SlugField(max_length=100, blank=True, null=True)
     categories = models.ManyToManyField('Category', related_name='youtubers')
 
@@ -45,7 +45,8 @@ class Video(models.Model):
         id: The primary key of the Video.
         title  The title of the video.
         url: The URL of the video.
-        youtuber: The Youtuber who posted the video. This is a foreign key referencing the Youtuber model.        slug_name: The slugified version of the video's title.
+        youtuber: The Youtuber who posted the video. The foreign key referencing the Youtuber model.
+        slug_name: The slugified version of the video's title.
 
     """
     id = models.AutoField(primary_key=True)

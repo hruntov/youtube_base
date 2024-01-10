@@ -10,7 +10,7 @@ class AddYoutuberForm(forms.ModelForm):
     """
     class Meta:
         model = Youtuber
-        fields = ['youtube', 'categories']
+        fields = ['youtube_url', 'categories']
         widgets = {
             'categories': forms.CheckboxSelectMultiple()
         }
