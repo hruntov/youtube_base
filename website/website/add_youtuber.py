@@ -1,6 +1,8 @@
-from googleapiclient.discovery import build
-from urllib.parse import urlparse, unquote
 import os
+from urllib.parse import unquote, urlparse
+
+from googleapiclient.discovery import build
+
 API_KEY = os.environ.get('API_KEY')
 
 
