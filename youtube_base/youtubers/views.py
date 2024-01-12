@@ -1,7 +1,14 @@
+from django import forms
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.utils.text import slugify
+from django.views.generic import ListView, TemplateView
+from django.views.generic.edit import FormView
+from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
+from .forms import AddYoutuberForm
+from .models import Category, Youtuber
 
 
 class TestTemplateView(TemplateView):
@@ -18,3 +25,33 @@ class HomeView(TemplateView):
 
     def home(request):
         return render(request, 'youtubers/home.html')
+
+
+class AddYoutuberView(FormView):
+    template_name = 'youtubers/add_youtuber.html'
+    form_class = AddYoutuberForm
+    success_url = reverse_lazy('add_youtuber')
+
+    def form_valid(self, form):
+        url = form.cleaned_data['youtube_url']
+        categories = form.cleaned_data['categories']
+        youtube_channel = YoutubeApi(url)
+        youtube_channel.get_channel_data()
+
+        youtuber = Youtuber(
+            channel_id=youtube_channel.channel_id,
+            channel_title=youtube_channel.channel_title,
+            username=youtube_channel.username,
+            channel_description=youtube_channel.channel_description,
+            youtube_url=youtube_channel.channel_url,
+            slug_name=slugify(youtube_channel.username)
+        )
+        youtuber.save()
+        youtuber.categories.set(categories)
+
+        return super().form_valid(form)
+
+
+class CategoryList(ListView):
+    model = Category
+    template_name = 'youtubers/category_list.html'

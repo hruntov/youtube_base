@@ -11,7 +11,7 @@ class YoutubeApi:
     channel_url = ''
 
     #: (str): The custom name of the channel.
-    username = ''
+    channel_username = ''
 
     #: (str): The identifier of the channel.
     channel_id = ''
@@ -22,7 +22,7 @@ class YoutubeApi:
     #: (str): The full description of the channel.
     channel_description = ''
 
-    def __init__(self, api_key, channel_url) -> None:
+    def __init__(self, channel_url) -> None:
         self.__api_key = os.environ.get('API_KEY')
         self.channel_url = channel_url
 
