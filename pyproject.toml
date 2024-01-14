@@ -13,13 +13,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-importlib = "^1.0.4"
 django = "^5.0"
 flake8 = "^6.1.0"
 selenium = "^4.16.0"
 google-api-python-client = "^2.111.0"
 isort = "^5.13.2"
 pytest = "^7.4.4"
+python-dotenv = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
