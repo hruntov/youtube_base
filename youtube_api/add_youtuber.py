@@ -1,6 +1,7 @@
 import os
 from urllib.parse import unquote, urlparse
 
+from dotenv import load_dotenv
 from googleapiclient.discovery import build
 
 
@@ -23,6 +24,7 @@ class YoutubeApi:
     channel_description = ''
 
     def __init__(self, channel_url) -> None:
+        load_dotenv()
         self.__api_key = os.environ.get('API_KEY')
         self.channel_url = channel_url
 
