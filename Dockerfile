@@ -39,5 +39,5 @@ RUN poetry install
 COPY . /website_wsl
 
 RUN chmod +x /website_wsl/start_web.sh
-
-CMD ["poetry", "run", "/website_wsl/start_web.sh"]
+RUN poetry shell
+CMD ["bash", "/website_wsl/start_web.sh"]
