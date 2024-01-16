@@ -1,7 +1,9 @@
-{% extends "base.html" %}
+
 {% block title %}
-    База українських кріейтерів
+
 {% endblock %}
 {% block content %}
-База українських кріейтерів
+<div class="container mt-4">
+    {% include 'youtubers/category_list.html' %}
+</div>
 {% endblock %}

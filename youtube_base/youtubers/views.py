@@ -1,4 +1,4 @@
-from django import forms
+from django.core.cache import cache
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -21,11 +21,55 @@ class TestTemplateView(TemplateView):
         return context
 
 
-class HomeView(TemplateView):
+class BaseCategoryMixin:
+    """
+    Mixin for views displaying categories.
+
+    This mixin provides a method to include categories in the context of a view. Categories are
+    retrieved from the cache, and if not present, they are fetched from the database and stored in
+    the cache.
+
+    """
+    def get_context_data(self, **kwargs):
+        """Enhances the context with category data.
+
+        Returns:
+            (dict): The context data.
+
+        """
+        context = super().get_context_data(**kwargs)
+        categories = cache.get('all_categories')
+
+        if categories is None:
+            categories = list(Category.objects.all())
+            cache.set('all_categories', categories)
+
+        context['categories'] = categories
+        return context
+
+
+class HomeView(BaseCategoryMixin, TemplateView):
+    """TemplateView for displaying the home page.
+
+    Attributes:
+        template_name (str): The template to use for rendering the view.
+
+    """
     template_name = "youtubers/home.html"
 
-    def home(request):
-        return render(request, 'youtubers/home.html')
+    def setup(self, request, *args, **kwargs):
+        """
+        Additional setup logic for the view.
+
+        Ensures that the context data, including categories, is prepared before rendering the
+            template.
+
+        Args:
+            (request): The HTTP request object.
+
+        """
+        super().setup(request, *args, **kwargs)
+        self.get_context_data()
 
 
 class AddYoutuberView(FormView):
@@ -53,6 +97,16 @@ class AddYoutuberView(FormView):
         return super().form_valid(form)
 
 
-class CategoryList(ListView):
+class CategoryList(BaseCategoryMixin, ListView):
+    """ListView for displaying a list of categories.
+
+    Attributes:
+        model(Category): The model class to use for the ListView.
+        template_name (str): The template to use for rendering the view.
+        context_object_name (str): The name of the variable to use for the list of categories in the
+            template context.
+
+    """
     model = Category
     template_name = 'youtubers/category_list.html'
+    context_object_name = 'categories'

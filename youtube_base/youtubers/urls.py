@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 from youtubers import views
 
-from .views import AddYoutuberView
-from .views import HomeView
+from .views import AddYoutuberView, HomeView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
