@@ -1,7 +1,18 @@
-<ul>
-    {% for category in object_list %}
-        <li>{{ category.name }}</li>
-    {% empty %}
-        <li>No categories available.</li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+
+{% block title %}
+    База українських кріейтерів
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Оберіть що вас цікавить:</h2>
+    <ul class="list-group">
+        {% for category in categories %}
+            <li class="list-group-item">{{ category.name }}</li>
+        {% empty %}
+            <li class="list-group-item list-group-item-no-categories">No categories available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
