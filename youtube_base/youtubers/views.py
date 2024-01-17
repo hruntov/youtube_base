@@ -1,14 +1,14 @@
+from django.contrib import messages
 from django.core.cache import cache
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
-
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm
+from .forms import AddYoutuberForm, CategoryForm
 from .models import Category, Youtuber
 
 
@@ -110,3 +110,41 @@ class CategoryList(BaseCategoryMixin, ListView):
     model = Category
     template_name = 'youtubers/category_list.html'
     context_object_name = 'categories'
+
+
+class YoutuberList(ListView):
+    """
+    A ListView that displays a list of Youtubers from chosen categories.
+
+    Attributes:
+        model (Youtuber): The model that this view displays. Set to the Youtuber model.
+
+    """
+    model = Youtuber
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for the YoutuberList view.
+
+        This method validates the submitted form and filters the list of Youtubers based on the
+        selected categories.
+        If the form is valid, it renders the 'youtubers/youtuber_list.html' template with the
+        filtered list of Youtubers.
+        If the form is not valid, it sends an error message and redirects the user to the home page.
+
+        Args:
+            request (HttpRequest): The request instance.
+
+        Returns:
+            (HttpResponse): The response instance. Either a rendered template with the filtered
+                list of Youtubers, or a redirect to the home page with error.
+
+        """
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            categories = form.cleaned_data['categories']
+            youtubers = Youtuber.objects.filter(categories__in=categories)
+            return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
+        else:
+            messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
+            return redirect('home')
