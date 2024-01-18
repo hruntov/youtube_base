@@ -5,13 +5,12 @@
 {% block content %}
 
     <div class="container">
-        <h1>Youtuber List</h1>
         <div class="row">
             {% for youtuber in youtubers %}
                 <div class="col-md-4">
                     <div class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">{{ youtuber.channel_title }}</h5>
+                            <h5 class="card-title"><a href="{% url 'youtuber_detail' youtuber.slug_name %}">{{ youtuber.channel_title }}</a></h5>
                             <p class="card-text">{{ youtuber.channel_description }}</p>
                             <a href="{{ youtuber.youtube_url }}" class="btn btn-primary">Go to channel</a>
                         </div>

@@ -3,8 +3,9 @@ from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-from django.views.generic import ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
+
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
@@ -148,3 +149,34 @@ class YoutuberList(ListView):
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
+
+
+class YoutuberDetailView(DetailView):
+    """A DetailView for displaying details of a Youtuber.
+
+    Attributes:
+        model (Model): The model that this view displays. In this case, it's the Youtuber model.
+        slug_field (str): The field that's used for search the Youtuber. In this case, it's
+            'slug_name'.
+        template_name (str): The template used for displaying the Youtuber. In this case, it's
+            'youtubers/youtuber_detail.html'.
+
+    """
+    model = Youtuber
+    slug_field = 'slug_name'
+    template_name = 'youtubers/youtuber_detail.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Overridden method from Django's DetailView to modify the context data.
+
+        This method retrieves the default context data from the superclass's method,
+        then changes the key from 'object' to 'youtuber' for clarity in the template.
+
+        Returns:
+            context (dict): The modified context data.
+
+        """
+        context = super().get_context_data(**kwargs)
+        context['youtuber'] = context.pop('object')
+        return context
