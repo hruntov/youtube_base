@@ -102,7 +102,7 @@ class CategoryList(BaseCategoryMixin, ListView):
     """ListView for displaying a list of categories.
 
     Attributes:
-        model(Category): The model class to use for the ListView.
+        model(Model): The model class to use for the ListView.
         template_name (str): The template to use for rendering the view.
         context_object_name (str): The name of the variable to use for the list of categories in the
             template context.
@@ -118,7 +118,7 @@ class YoutuberList(ListView):
     A ListView that displays a list of Youtubers from chosen categories.
 
     Attributes:
-        model (Youtuber): The model that this view displays. Set to the Youtuber model.
+        model (Model): The model that this view displays. Set to the Youtuber model.
 
     """
     model = Youtuber
