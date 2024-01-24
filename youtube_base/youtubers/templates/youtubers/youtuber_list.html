@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            {% for youtuber in youtubers %}
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{% url 'youtuber_detail' youtuber.slug_name %}">{{ youtuber.channel_title }}</a></h5>
+                            <p class="card-text">{{ youtuber.channel_description }}</p>
+                            <a href="{{ youtuber.youtube_url }}" class="btn btn-primary">Go to channel</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No youtubers found for the selected categories.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

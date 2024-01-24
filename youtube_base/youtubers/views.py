@@ -1,14 +1,15 @@
+from django.contrib import messages
 from django.core.cache import cache
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-from django.views.generic import ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
 
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm
+from .forms import AddYoutuberForm, CategoryForm
 from .models import Category, Youtuber
 
 
@@ -101,7 +102,7 @@ class CategoryList(BaseCategoryMixin, ListView):
     """ListView for displaying a list of categories.
 
     Attributes:
-        model(Category): The model class to use for the ListView.
+        model(Model): The model class to use for the ListView.
         template_name (str): The template to use for rendering the view.
         context_object_name (str): The name of the variable to use for the list of categories in the
             template context.
@@ -110,3 +111,72 @@ class CategoryList(BaseCategoryMixin, ListView):
     model = Category
     template_name = 'youtubers/category_list.html'
     context_object_name = 'categories'
+
+
+class YoutuberList(ListView):
+    """
+    A ListView that displays a list of Youtubers from chosen categories.
+
+    Attributes:
+        model (Model): The model that this view displays. Set to the Youtuber model.
+
+    """
+    model = Youtuber
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for the YoutuberList view.
+
+        This method validates the submitted form and filters the list of Youtubers based on the
+        selected categories.
+        If the form is valid, it renders the 'youtubers/youtuber_list.html' template with the
+        filtered list of Youtubers.
+        If the form is not valid, it sends an error message and redirects the user to the home page.
+
+        Args:
+            request (HttpRequest): The request instance.
+
+        Returns:
+            (HttpResponse): The response instance. Either a rendered template with the filtered
+                list of Youtubers, or a redirect to the home page with error.
+
+        """
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            categories = form.cleaned_data['categories']
+            youtubers = Youtuber.objects.filter(categories__in=categories)
+            return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
+        else:
+            messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
+            return redirect('home')
+
+
+class YoutuberDetailView(DetailView):
+    """A DetailView for displaying details of a Youtuber.
+
+    Attributes:
+        model (Model): The model that this view displays. In this case, it's the Youtuber model.
+        slug_field (str): The field that's used for search the Youtuber. In this case, it's
+            'slug_name'.
+        template_name (str): The template used for displaying the Youtuber. In this case, it's
+            'youtubers/youtuber_detail.html'.
+
+    """
+    model = Youtuber
+    slug_field = 'slug_name'
+    template_name = 'youtubers/youtuber_detail.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Overridden method from Django's DetailView to modify the context data.
+
+        This method retrieves the default context data from the superclass's method,
+        then changes the key from 'object' to 'youtuber' for clarity in the template.
+
+        Returns:
+            context (dict): The modified context data.
+
+        """
+        context = super().get_context_data(**kwargs)
+        context['youtuber'] = context.pop('object')
+        return context
