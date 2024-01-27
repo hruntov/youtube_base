@@ -7,6 +7,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
 
 from youtube_api.add_youtuber import YoutubeApi
+from .serialaizer import YoutuberSerializer
 
 from . import models
 from .forms import AddYoutuberForm, CategoryForm
@@ -145,10 +146,32 @@ class YoutuberList(ListView):
         if form.is_valid():
             categories = form.cleaned_data['categories']
             youtubers = Youtuber.objects.filter(categories__in=categories)
+
+            serializer = YoutuberSerializer(youtubers, many=True)
+            youtubers = serializer.data
+            request.session["youtubers"] = youtubers
+
             return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests for the YoutuberList view.
+
+        This method retrieves the list of Youtubers from the session that was stored during the POST
+        request. It then renders the 'youtubers/youtuber_list.html' template with the list of Youtubers.
+
+        Args:
+            request (HttpRequest): The request instance.
+
+        Returns:
+            (HttpResponse): The response instance. A rendered template with the list of Youtubers.
+
+        """
+        youtubers = request.session.get("youtubers", [])
+        return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
 
 
 class YoutuberDetailView(DetailView):
