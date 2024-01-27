@@ -23,6 +23,8 @@ python-dotenv = "^1.0.0"
 crispy-bootstrap4 = "^2023.1"
 django-crispy-forms = "^2.1"
 django-rest-framework = "^0.1.0"
+djangorestframework = "^3.14.0"
+
 
 [build-system]
 requires = ["poetry-core"]
