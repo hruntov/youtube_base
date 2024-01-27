@@ -40,3 +40,6 @@ jobs:
             echo "Tests failed. Aborting push."
             exit 1
           fi
+      - name: Run users unit tests
+        run: |
+          poetry run python youtube_base/manage.py test users

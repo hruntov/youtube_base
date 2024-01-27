@@ -22,5 +22,6 @@ from youtubers import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('test', views.TestTemplateView.as_view()),
-    path('', include('youtubers.urls'))
+    path('', include('youtubers.urls')),
+    path('', include('users.urls')),
 ]

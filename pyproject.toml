@@ -20,7 +20,10 @@ google-api-python-client = "^2.111.0"
 isort = "^5.13.2"
 pytest = "^7.4.4"
 python-dotenv = "^1.0.0"
+crispy-bootstrap4 = "^2023.1"
+django-crispy-forms = "^2.1"
 djangorestframework = "^3.14.0"
+
 
 [build-system]
 requires = ["poetry-core"]

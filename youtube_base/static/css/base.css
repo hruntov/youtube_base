@@ -71,3 +71,14 @@ main {
     color: #888;
     font-style: italic;
 }
+
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.username {
+    font-size: 1.2em;
+    font-weight: bold;
+}
