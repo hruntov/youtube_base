@@ -7,11 +7,11 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
 
 from youtube_api.add_youtuber import YoutubeApi
-from .serialaizer import YoutuberSerializer
 
 from . import models
 from .forms import AddYoutuberForm, CategoryForm
 from .models import Category, Youtuber
+from .serialaizer import YoutuberSerializer
 
 
 class TestTemplateView(TemplateView):
@@ -187,6 +187,7 @@ class YoutuberDetailView(DetailView):
     """
     model = Youtuber
     slug_field = 'slug_name'
+    slug_url_kwarg = 'slug_name'
     template_name = 'youtubers/youtuber_detail.html'
 
     def get_context_data(self, **kwargs):

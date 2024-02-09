@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Youtuber(models.Model):
@@ -43,6 +44,9 @@ class Youtuber(models.Model):
     class Meta:
         verbose_name_plural = "Youtubers"
         ordering = ['id']
+
+    def get_absolute_url(self):
+        return reverse('youtuber_detail', args=[str(self.slug_name)])
 
 
 class Video(models.Model):

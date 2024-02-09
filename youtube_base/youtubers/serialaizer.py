@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Youtuber
 
 
@@ -16,7 +17,14 @@ class YoutuberSerializer(serializers.ModelSerializer):
     Attributes:
         model (Model): The model the serializer is tied to, in this case, the Youtuber model.
         fields (str): The fields from the model to be serialized. '__all__' to include all fields.
+
     """
+    absolute_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Youtuber
         fields = '__all__'
+
+    def get_absolute_url(self, obj):
+        print(obj.get_absolute_url, 'qaqwsdqwdewdfewf')
+        return obj.get_absolute_url()
