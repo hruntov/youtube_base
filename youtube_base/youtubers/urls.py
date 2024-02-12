@@ -10,7 +10,7 @@ urlpatterns = [
     path('add_youtuber/', AddYoutuberView.as_view(), name='add_youtuber'),
     path('category_list/', views.CategoryList.as_view(), name='category_list'),
     path('youtuber_list/', views.YoutuberList.as_view(), name='youtuber_list'),
-    path('youtuber_list/<slug:slug>/',
+    path('youtuber_list/<slug:slug_name>/',
          views.YoutuberDetailView.as_view(),
          name='youtuber_detail'),
 ]
