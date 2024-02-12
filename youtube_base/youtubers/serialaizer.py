@@ -26,5 +26,4 @@ class YoutuberSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_absolute_url(self, obj):
-        print(obj.get_absolute_url, 'qaqwsdqwdewdfewf')
         return obj.get_absolute_url()
