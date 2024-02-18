@@ -31,8 +31,13 @@ jobs:
       - name: Start Django server
         run: |
           poetry run python youtube_base/manage.py runserver & sleep 10
-      - name: Run migrations
-        run: poetry run python youtube_base/manage.py migrate
+      - name: Run migrations and fixtures
+        run: |
+          cd youtube_base && \
+          poetry run python manage.py migrate && \
+          poetry run python manage.py loaddata youtubers/fixtures/categories.json && \
+          poetry run python manage.py loaddata youtubers/fixtures/youtubers.json && \
+          poetry run echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin')"
       - name: Run pytest
         run: |
           poetry run pytest -v
@@ -43,3 +48,6 @@ jobs:
       - name: Run users unit tests
         run: |
           poetry run python youtube_base/manage.py test users
+      - name: Run youtubers unit tests
+        run: |
+          poetry run python youtube_base/manage.py test youtubers

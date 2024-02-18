@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.cache import cache
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -123,6 +124,8 @@ class YoutuberList(ListView):
 
     """
     model = Youtuber
+    paginate_by = 3
+    template_name = 'youtubers/youtuber_list.html'
 
     def post(self, request, *args, **kwargs):
         """
@@ -147,11 +150,16 @@ class YoutuberList(ListView):
             categories = form.cleaned_data['categories']
             youtubers = Youtuber.objects.filter(categories__in=categories)
 
+            page = request.POST.get('page', 1)
+            youtubers_paginated = self._get_paginated_data(youtubers, page)
+
             serializer = YoutuberSerializer(youtubers, many=True)
             youtubers = serializer.data
             request.session["youtubers"] = youtubers
 
-            return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
+            return render(request,
+                          'youtubers/youtuber_list.html',
+                          {'youtubers': youtubers_paginated})
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
@@ -170,8 +178,36 @@ class YoutuberList(ListView):
             (HttpResponse): The response instance. A rendered template with the list of Youtubers.
 
         """
+        page = request.GET.get('page', 1)
         youtubers = request.session.get("youtubers", [])
-        return render(request, 'youtubers/youtuber_list.html', {'youtubers': youtubers})
+        youtubers_paginated = self._get_paginated_data(youtubers, page)
+        return render(request, self.template_name, {'youtubers': youtubers_paginated})
+
+    def _get_paginated_data(self, data, page):
+        """
+        This function creates a Paginator instance with the provided data and page size. It then
+        gets the current page number from the request's GET parameters and retrieves the Page
+        instance for that page number.
+
+        Args:
+            request (HttpRequest): The request instance.
+            data (QuerySet): The data to be paginated.
+            page_size (int): The number of items per page.
+
+        Returns:
+            page (Page): The Page instance for the current page number. Contains the items for the
+                current page, as well as pagination information (e.g., whether there are
+                previous/next pages).
+
+        """
+        paginator = Paginator(data, self.paginate_by)
+        try:
+            paginated_data = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_data = paginator.page(1)
+        except EmptyPage:
+            paginated_data = paginator.page(paginator.num_pages)
+        return paginated_data
 
 
 class YoutuberDetailView(DetailView):

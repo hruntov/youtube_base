@@ -1,16 +1,32 @@
+from django.core.paginator import Page, Paginator
 from django.test import TestCase
 
-from . import models
+from .models import Category, Youtuber
+from .views import YoutuberList
 
 
-class SimpleTest(TestCase):
+class PaginationTest(TestCase):
+    def setUp(self):
+        self.youtuber_list = YoutuberList()
+        for category in range(5):
+            category = Category.objects.create(name=f'Category {category}',
+                                               description=f'Description {category}')
+            for name in range(2):
+                youtuber = Youtuber.objects.create(channel_title=f'Youtuber {name}\
+                                                        for Category {category}',
+                                                   channel_description=f'Description {name}\
+                                                        for Category {category}')
+                youtuber.categories.add(category)
 
-    def test_first_object_in_db(self):
-        # The object was created in a migration step
-        obj1 = models.TestModel.objects.first()
-        self.assertEqual(obj1.test_text, 'Test 1')
+    def test_pagination(self):
+        test_data = Youtuber.objects.all()
+        page_data = self.youtuber_list._get_paginated_data(test_data, page=1)
+        self.assertIsInstance(page_data, Page)
 
-    def test_second_object_in_db(self):
-        # The object was created in a migration step
-        obj1 = models.TestModel.objects.get(pk=2)
-        self.assertEqual(obj1.test_text, 'Test 2')
+        page_data = self.youtuber_list._get_paginated_data(test_data, page=9999)
+        self.assertIsInstance(page_data, Page)
+        self.assertEqual(page_data.number, 4)
+
+        page_data = self.youtuber_list._get_paginated_data(test_data, page='Not the integer!')
+        self.assertIsInstance(page_data, Page)
+        self.assertEqual(page_data.number, 1)
