@@ -10,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from curses.ascii import EM
-from dotenv import load_dotenv
 import os
+from curses.ascii import EM
 from pathlib import Path
 
+from dotenv import load_dotenv
 
 load_dotenv()
 
