@@ -24,6 +24,9 @@ crispy-bootstrap4 = "^2023.1"
 django-crispy-forms = "^2.1"
 djangorestframework = "^3.14.0"
 
+[tool.poetry.dependencies.windows-curses]
+version = "^2.3.2"
+platform = "windows"
 
 [build-system]
 requires = ["poetry-core"]
