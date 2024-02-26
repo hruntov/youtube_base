@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+
 {% block content %}
   <div class="container">
     <div class="card">
@@ -20,6 +22,7 @@
           <p><a href="{{ youtuber.facebook_url }}" class="btn btn-primary">Facebook</a></p>
         {% endif %}
       </div>
+      {% include 'youtubers/comment_form.html' %}
     </div>
   </div>
 {% endblock %}

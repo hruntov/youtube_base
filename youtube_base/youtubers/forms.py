@@ -1,6 +1,9 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+
 from django import forms
 
-from .models import Category, Youtuber
+from .models import Category, Comment, Youtuber
 
 
 class AddYoutuberForm(forms.ModelForm):
@@ -52,3 +55,24 @@ class CategoryForm(forms.Form):
 
         if not categories:
             raise forms.ValidationError("")
+
+
+class CommentForm(forms.ModelForm):
+    """
+    A Django form used for creating a new Comment instance.
+
+    Attributes:
+        text (forms.CharField): A field for entering the comment text.
+
+    """
+    text = forms.CharField(widget=forms.Textarea, label='Комментар')
+
+    class Meta:
+        model = Comment
+        fields = ['text']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit(name='submit', value='Відправити'))

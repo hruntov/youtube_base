@@ -1,8 +1,12 @@
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.paginator import Page, Paginator
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
 
-from .models import Category, Youtuber
-from .views import YoutuberList
+from .forms import CommentForm
+from .models import Category, Comment, Youtuber
+from .views import YoutuberDetailView, YoutuberList
 
 
 class PaginationTest(TestCase):
@@ -30,3 +34,48 @@ class PaginationTest(TestCase):
         page_data = self.youtuber_list._get_paginated_data(test_data, page='Not the integer!')
         self.assertIsInstance(page_data, Page)
         self.assertEqual(page_data.number, 1)
+
+
+class YoutuberDetailViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.youtuber = Youtuber.objects.create(channel_title='Test Youtuber',
+                                                channel_description='Test Description')
+        self.view = YoutuberDetailView()
+
+    def _create_request(self, method, data=None):
+        if method.lower() == 'post':
+            request = self.factory.post(reverse('youtuber_detail',
+                                                args=[self.youtuber.slug_name]), data or {})
+        else:
+            request = self.factory.get(reverse('youtuber_detail', args=[self.youtuber.slug_name]))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        return request
+
+    def test_post_comment_authenticated(self):
+        request = self._create_request('post', {'text': 'Test Comment'})
+        request.user = self.user
+
+        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(Comment.objects.first().text, 'Test Comment')
+
+    def test_post_comment_unauthenticated(self):
+        request = self._create_request('post', {'text': 'Test Comment'})
+        request.user = AnonymousUser()
+
+        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 0)
+
+    def test_post_comment_invalid_form(self):
+        request = self._create_request('post', {'text': ''})
+        request.user = self.user
+
+        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 0)

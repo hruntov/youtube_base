@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Video, Youtuber
+from .models import Category, Comment, Video, Youtuber
 
 
 class YoutuberAdmin(admin.ModelAdmin):
@@ -33,6 +33,19 @@ class CategoryAdmin(admin.ModelAdmin):
                     'description')
 
 
+class CommentAdmin(admin.ModelAdmin):
+    """The CommentAdmin class defines the admin interface for the Comment model."""
+    list_display = ('name',
+                    'text',
+                    'youtuber',
+                    'created_at')
+    list_filter = ('created_at',
+                   'updated_at')
+    search_fields = ('name',
+                     'text')
+
+
 admin.site.register(Youtuber, YoutuberAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Video)
+admin.site.register(Comment, CommentAdmin)

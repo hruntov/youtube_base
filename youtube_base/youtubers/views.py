@@ -1,17 +1,18 @@
 from django.contrib import messages
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
 
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm
-from .models import Category, Youtuber
+from .forms import AddYoutuberForm, CategoryForm, CommentForm
+from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
 
@@ -239,4 +240,33 @@ class YoutuberDetailView(DetailView):
         """
         context = super().get_context_data(**kwargs)
         context['youtuber'] = context.pop('object')
+        context['form'] = CommentForm()
         return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for the YoutuberDetailView. This method validates the submitted form
+        and saves the comment to the database.
+
+        Args:
+            request (HttpRequest): The request instance.
+
+        Returns:
+            (HttpResponse): The response instance. Either a redirect to the same page with the new
+                comment, or a redirect to the same page with an error message.
+
+        """
+        youtuber = get_object_or_404(Youtuber, slug_name=kwargs.get('slug_name'))
+        form = CommentForm(data=request.POST)
+        if not request.user.is_authenticated:
+            messages.error(request, 'Будь-ласка увійдіть, щоб залишити коментар.')
+            return redirect('youtuber_detail', slug_name=youtuber.slug_name)
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.youtuber = youtuber
+            comment.save()
+            return redirect('youtuber_detail', slug_name=youtuber.slug_name)
+        else:
+            messages.error(request, 'Будь-ласка введіть коректний коментар.')
+            return redirect('youtuber_detail', slug_name=youtuber.slug_name)
