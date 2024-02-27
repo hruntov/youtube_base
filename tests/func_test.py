@@ -77,6 +77,30 @@ class BasicInstallTest(unittest.TestCase):
         except NoSuchElementException:
             print("Paginator error in the last page.")
 
+    def test_add_comment(self):
+        self.browser.get("http://localhost:8000/login/")
+
+        username_input = self.browser.find_element(By.NAME, "username")
+        password_input = self.browser.find_element(By.NAME, "password")
+
+        username_input.send_keys('test_user')
+        password_input.send_keys('test_password')
+        self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+
+        self.browser.get(f"http://localhost:8000/youtuber_list/gamewizua/")
+
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
+        comment_input = self.browser.find_element(By.NAME, "text")
+        comment_input.send_keys('This is a test comment')
+        send_button = self.browser.find_element(By.XPATH, '//input[@value="Відправити"]')
+        send_button.click()
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, 'comment-1')))
+
+        test_card = self.browser.find_element(By.ID, 'comment-1')
+        comment_text = test_card.find_element(By.CSS_SELECTOR, '.card-text').text
+
+        self.assertEqual(comment_text, 'This is a test comment')
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -241,6 +241,7 @@ class YoutuberDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['youtuber'] = context.pop('object')
         context['form'] = CommentForm()
+        context['comments'] = Comment.objects.filter(youtuber=context['youtuber']).order_by('-created_at')[:5]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -265,6 +266,7 @@ class YoutuberDetailView(DetailView):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.youtuber = youtuber
+            comment.name = request.user
             comment.save()
             return redirect('youtuber_detail', slug_name=youtuber.slug_name)
         else:

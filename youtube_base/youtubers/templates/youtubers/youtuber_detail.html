@@ -22,6 +22,20 @@
           <p><a href="{{ youtuber.facebook_url }}" class="btn btn-primary">Facebook</a></p>
         {% endif %}
       </div>
+      {% with comments.count as total_comments %}
+      {% if comments.count > 0 %}
+      <h2> Коментарі: {{ total_comments }}</h2>
+      {% endif %}
+      {% endwith %}
+      {% for comment in comments %}
+        <div class="card-body" id="comment-{{ forloop.counter }}">
+          {{ comment.created_at }}
+          <h5 class="card-title">{{ comment.name }}</h5>
+          <p class="card-text">{{ comment.text }}</p>
+        </div>
+        {% empty %}
+        <p>Коментарів поки немає.</p>
+      {% endfor %}
       {% include 'youtubers/comment_form.html' %}
     </div>
   </div>
