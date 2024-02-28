@@ -77,7 +77,7 @@ class BasicInstallTest(unittest.TestCase):
         except NoSuchElementException:
             print("Paginator error in the last page.")
 
-    def test_add_comment(self):
+    def test_add_comment_authorized(self):
         self.browser.get("http://localhost:8000/login/")
 
         username_input = self.browser.find_element(By.NAME, "username")
@@ -100,6 +100,22 @@ class BasicInstallTest(unittest.TestCase):
         comment_text = test_card.find_element(By.CSS_SELECTOR, '.card-text').text
 
         self.assertEqual(comment_text, 'This is a test comment')
+
+    def test_comment_unauthorized(self):
+        self.browser.get("http://localhost:8000/youtuber_list/gamewizua/")
+
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
+        comment_input = self.browser.find_element(By.NAME, "text")
+        comment_input.send_keys('This is a test comment')
+        send_button = self.browser.find_element(By.XPATH, '//input[@value="Відправити"]')
+        send_button.click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'alert-danger')))
+
+        error_message = self.browser.find_element(By.CLASS_NAME, 'alert-danger').text
+
+        self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
 
 
 if __name__ == "__main__":
