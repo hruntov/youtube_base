@@ -45,8 +45,14 @@
       {% for comment in comments %}
         <div class="card-body" id="comment-{{ forloop.counter }}">
           {{ comment.created_at }}
-          <h5 class="card-title">{{ comment.name }}</h5>
+          <h5 class="card-title">{{ comment.user }}</h5>
           <p class="card-text">{{ comment.text }}</p>
+          {% if user.is_authenticated and user.id == comment.user_id %}
+            <form method="POST" action="{% url 'comment_delete' comment.id %}">
+              {% csrf_token %}
+              <button id="delete-comment-button" type="submit" class="btn btn-danger">Видалити коментар</button>
+            </form>
+          {% endif %}
         </div>
         {% empty %}
         <p>Коментарів поки немає.</p>

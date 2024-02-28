@@ -4,6 +4,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.text import slugify
+from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
@@ -266,9 +267,21 @@ class YoutuberDetailView(DetailView):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.youtuber = youtuber
-            comment.name = request.user
+            comment.user = request.user
             comment.save()
             return redirect('youtuber_detail', slug_name=youtuber.slug_name)
         else:
             messages.error(request, 'Будь-ласка введіть коректний коментар.')
             return redirect('youtuber_detail', slug_name=youtuber.slug_name)
+
+
+class CommentDeleteView(View):
+    """A View for deleting comments."""
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=kwargs.get('id'))
+        if request.user == comment.user:
+            comment.delete()
+            messages.success(request, 'Коментар видалено.')
+        else:
+            messages.error(request, 'Ви не можете видалити цей коментар.')
+        return redirect('youtuber_detail', slug_name=comment.youtuber.slug_name)

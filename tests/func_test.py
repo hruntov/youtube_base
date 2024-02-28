@@ -77,7 +77,7 @@ class BasicInstallTest(unittest.TestCase):
         except NoSuchElementException:
             print("Paginator error in the last page.")
 
-    def test_add_comment_authorized(self):
+    def test_add_and_delete_comment_authorized(self):
         self.browser.get("http://localhost:8000/login/")
 
         username_input = self.browser.find_element(By.NAME, "username")
@@ -100,6 +100,20 @@ class BasicInstallTest(unittest.TestCase):
         comment_text = test_card.find_element(By.CSS_SELECTOR, '.card-text').text
 
         self.assertEqual(comment_text, 'This is a test comment')
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, 'delete-comment-button')))
+        delete_button = self.browser.find_element(By.ID, 'delete-comment-button')
+        delete_button.click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'alert-success')))
+        success_message = self.browser.find_element(By.CLASS_NAME, 'alert-success').text
+        self.assertEqual(success_message, 'Коментар видалено.')
+
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element(By.XPATH, "//*[contains(text(), 'This is a test comment')]")
+
 
     def test_comment_unauthorized(self):
         self.browser.get("http://localhost:8000/youtuber_list/gamewizua/")
