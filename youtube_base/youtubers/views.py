@@ -8,11 +8,12 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
+from taggit.models import Tag
 
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
@@ -130,41 +131,44 @@ class YoutuberList(ListView):
     template_name = 'youtubers/youtuber_list.html'
 
     def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests for the YoutuberList view.
-
-        This method validates the submitted form and filters the list of Youtubers based on the
-        selected categories.
-        If the form is valid, it renders the 'youtubers/youtuber_list.html' template with the
-        filtered list of Youtubers.
-        If the form is not valid, it sends an error message and redirects the user to the home page.
-
-        Args:
-            request (HttpRequest): The request instance.
-
-        Returns:
-            (HttpResponse): The response instance. Either a rendered template with the filtered
-                list of Youtubers, or a redirect to the home page with error.
-
-        """
         form = CategoryForm(request.POST)
+        tag_form = TagForm(request.POST)
+
         if form.is_valid():
             categories = form.cleaned_data['categories']
             youtubers = Youtuber.objects.filter(categories__in=categories)
-
-            page = request.POST.get('page', 1)
-            youtubers_paginated = self._get_paginated_data(youtubers, page)
-
-            serializer = YoutuberSerializer(youtubers, many=True)
-            youtubers = serializer.data
-            request.session["youtubers"] = youtubers
-
-            return render(request,
-                          'youtubers/youtuber_list.html',
-                          {'youtubers': youtubers_paginated})
+        elif tag_form.is_valid():
+            tag = tag_form.cleaned_data['tag']
+            youtubers = Youtuber.objects.filter(tags__name__in=[tag])
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
+
+        return self.render_youtubers(request, youtubers)
+
+    def render_youtubers(self, request, youtubers):
+        """
+        Renders the 'youtubers/youtuber_list.html' template with the provided list of Youtubers.
+
+        Args:
+            request (HttpRequest): The request instance.
+            youtubers (QuerySet): The list of Youtubers to display.
+
+        Returns:
+            (HttpResponse): The response instance. A rendered template with the paginated list of
+                Youtubers.
+
+        """
+        page = request.POST.get('page', 1)
+        youtubers_paginated = self._get_paginated_data(youtubers, page)
+
+        serializer = YoutuberSerializer(youtubers, many=True)
+        youtubers = serializer.data
+        request.session["youtubers"] = youtubers
+
+        return render(request,
+                      'youtubers/youtuber_list.html',
+                      {'youtubers': youtubers_paginated})
 
     def get(self, request, *args, **kwargs):
         """
@@ -210,6 +214,16 @@ class YoutuberList(ListView):
         except EmptyPage:
             paginated_data = paginator.page(paginator.num_pages)
         return paginated_data
+
+    def pagination(self, request, youtubers):
+        page = request.POST.get('page', 1)
+        youtubers_paginated = self._get_paginated_data(youtubers, page)
+
+        serializer = YoutuberSerializer(youtubers, many=True)
+        youtubers = serializer.data
+
+    def session(self, request, youtubers):
+        request.session["youtubers"] = youtubers
 
 
 class YoutuberDetailView(DetailView):
