@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -87,3 +88,30 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
         ordering = ['name']
+
+
+class Comment(models.Model):
+    """The Comment model represents a youtuber comment posted by a user.
+
+    Attributes:
+        id: The primary key of the Comment.
+        text: The text of the comment.
+        created_at: The date and time when the comment was posted.
+        updated_at: The date and time when the comment was last updated.
+        youtuber: The Youtuber that the comment is posted on. The foreign key referencing the Youtuber model.
+
+    """
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    youtuber = models.ForeignKey('Youtuber', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+
+    def __str__(self):
+        return f'Comment by {self.name} on {self.youtuber.channel_title}'
+
+    class Meta:
+        ordering = ['created_at']
+        indexes = [models.Index(fields=['created_at'])]
