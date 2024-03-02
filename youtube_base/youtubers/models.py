@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from taggit.managers import TaggableManager
 
 
 class Youtuber(models.Model):
@@ -38,6 +39,7 @@ class Youtuber(models.Model):
     facebook_url = models.CharField(max_length=100, blank=True, null=True)
     slug_name = models.SlugField(max_length=100, blank=True, null=True)
     categories = models.ManyToManyField('Category', related_name='youtubers')
+    tags = TaggableManager()
 
     def __str__(self):
         return self.channel_title
