@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+
 {% block content %}
   <div class="container">
     <div class="card">
@@ -20,6 +22,42 @@
           <p><a href="{{ youtuber.facebook_url }}" class="btn btn-primary">Facebook</a></p>
         {% endif %}
       </div>
+      {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+                    {% if 'error' in message.tags %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% else %}
+                        {{ message }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+      {% endif %}
+      {% with comments.count as total_comments %}
+      {% if comments.count > 0 %}
+      <h2> Коментарі: {{ total_comments }}</h2>
+      {% endif %}
+      {% endwith %}
+      {% for comment in comments %}
+        <div class="card-body" id="comment-{{ forloop.counter }}">
+          {{ comment.created_at }}
+          <h5 class="card-title">{{ comment.user }}</h5>
+          <p class="card-text">{{ comment.text }}</p>
+          {% if user.is_authenticated and user.id == comment.user_id %}
+            <form method="POST" action="{% url 'comment_delete' comment.id %}">
+              {% csrf_token %}
+              <button id="delete-comment-button" type="submit" class="btn btn-danger">Видалити коментар</button>
+            </form>
+          {% endif %}
+        </div>
+        {% empty %}
+        <p>Коментарів поки немає.</p>
+      {% endfor %}
+      {% include 'youtubers/comment_form.html' %}
     </div>
   </div>
 {% endblock %}

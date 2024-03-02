@@ -3,21 +3,6 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
-    {% if user.is_authenticated %}
-    <div class="user-info">
-        <p>Ви ввійшли як <a class="username" href="/profile">{{ user.username }}</a></p>
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Вийти</button>
-        </form>
-    </div>
-    {% else %}
-    <p>Don't have an account? Sign up <a href="{% url 'sign_up' %}">here</a>!</p>
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <a href="{% url 'login' %}" class="btn btn-success">Ввійти</a>
-    </form>
-    {% endif %}
     {% include 'youtubers/category_list.html' %}
 </div>
 {% endblock %}

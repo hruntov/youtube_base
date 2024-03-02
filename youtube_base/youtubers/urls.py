@@ -3,7 +3,7 @@ from django.urls import include, path
 
 from youtubers import views
 
-from .views import AddYoutuberView, HomeView, YoutuberDetailView
+from .views import (AddYoutuberView, CommentDeleteView, HomeView, YoutuberDetailView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -13,4 +13,5 @@ urlpatterns = [
     path('youtuber_list/<slug:slug_name>/',
          views.YoutuberDetailView.as_view(),
          name='youtuber_detail'),
+    path('comment/<int:id>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 ]
