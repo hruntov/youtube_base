@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
 
-{% block content %}
-    {% crispy form %}
-{% endblock %}
+<form method="post" action="{% url 'add_comment' youtuber.slug_name %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Додати коментар</button>
+</form>
