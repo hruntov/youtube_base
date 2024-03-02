@@ -77,6 +77,60 @@ class BasicInstallTest(unittest.TestCase):
         except NoSuchElementException:
             print("Paginator error in the last page.")
 
+    def test_add_and_delete_comment_authorized(self):
+        self.browser.get("http://localhost:8000/login/")
+
+        username_input = self.browser.find_element(By.NAME, "username")
+        password_input = self.browser.find_element(By.NAME, "password")
+
+        username_input.send_keys('test_user')
+        password_input.send_keys('test_password')
+        self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+
+        self.browser.get(f"http://localhost:8000/youtuber_list/gamewizua/")
+
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
+        comment_input = self.browser.find_element(By.NAME, "text")
+        comment_input.send_keys('This is a test comment')
+        send_button = self.browser.find_element(By.XPATH, '//input[@value="Відправити"]')
+        send_button.click()
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, 'comment-1')))
+
+        test_card = self.browser.find_element(By.ID, 'comment-1')
+        comment_text = test_card.find_element(By.CSS_SELECTOR, '.card-text').text
+
+        self.assertEqual(comment_text, 'This is a test comment')
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, 'delete-comment-button')))
+        delete_button = self.browser.find_element(By.ID, 'delete-comment-button')
+        delete_button.click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'alert-success')))
+        success_message = self.browser.find_element(By.CLASS_NAME, 'alert-success').text
+        self.assertEqual(success_message, 'Коментар видалено.')
+
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element(By.XPATH, "//*[contains(text(), 'This is a test comment')]")
+
+
+    def test_comment_unauthorized(self):
+        self.browser.get("http://localhost:8000/youtuber_list/gamewizua/")
+
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
+        comment_input = self.browser.find_element(By.NAME, "text")
+        comment_input.send_keys('This is a test comment')
+        send_button = self.browser.find_element(By.XPATH, '//input[@value="Відправити"]')
+        send_button.click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'alert-danger')))
+
+        error_message = self.browser.find_element(By.CLASS_NAME, 'alert-danger').text
+
+        self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
+
 
 if __name__ == "__main__":
     unittest.main()
