@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'youtubers',
     'users',
     'rest_framework',
+    'taggit',
 ]
 
 MIDDLEWARE = [
