@@ -13,6 +13,11 @@
                 <button type="submit">{{ tag.name }}</button>
             </form>
           {% endfor %}
+          <form method="post" action="{% url 'youtuber_detail' youtuber.slug_name %}">
+            {% csrf_token %}
+            {{ tag_form.as_p }}
+            <button type="submit">Додати тег</button>
+          </form>
         </p>
         <p class="card-text">{{ youtuber.channel_description }}</p>
         {% if youtuber.youtube_url %}

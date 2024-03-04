@@ -257,6 +257,7 @@ class YoutuberDetailView(DetailView):
         context['youtuber'] = context.pop('object')
         context['form'] = CommentForm()
         context['comments'] = Comment.objects.filter(youtuber=context['youtuber']).order_by('-created_at')[:5]
+        context['tag_form'] = TagForm()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -299,3 +300,38 @@ class CommentDeleteView(View):
         else:
             messages.error(request, 'Ви не можете видалити цей коментар.')
         return redirect('youtuber_detail', slug_name=comment.youtuber.slug_name)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for the YoutuberDetailView.
+
+        This method retrieves the Youtuber object for the current view, validates the submitted
+        TagForm, and if valid, adds the submitted tag to the Youtuber.
+
+        Args:
+            request (HttpRequest): The request instance.
+
+        Returns:
+            (HttpResponse): The response instance. A rendered template with the updated Youtuber
+                detail.
+
+        """
+        self.object = self.get_object()
+        tag_form = TagForm(request.POST)
+        if tag_form.is_valid():
+            self.add_tag_to_youtuber(tag_form.cleaned_data['tag'])
+        return self.render_to_response(self.get_context_data())
+
+    def add_tag_to_youtuber(self, tag_name):
+        """
+        Adds a tag to the Youtuber object for the current view.
+
+        This method retrieves or creates a Tag object with the provided name, then adds it to the
+        Youtuber's tags.
+
+        Args:
+            tag_name (str): The name of the tag to add.
+
+        """
+        tag, created = Tag.objects.get_or_create(name=tag_name)
+        self.object.tags.add(tag)
