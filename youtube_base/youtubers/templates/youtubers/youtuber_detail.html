@@ -7,16 +7,16 @@
         <h1 class="card-title">{{ youtuber.channel_title }}</h1>
         <p class="tags">Tags:
           {% for tag in youtuber.tags.all %}
-              <form method="post" action="{% url 'youtuber_list' %}">
+              <form method="post" id="tag" action="{% url 'youtuber_list' %}">
                 {% csrf_token %}
                 <input type="hidden" name="tag" value="{{ tag.name }}">
-                <button type="submit">{{ tag.name }}</button>
+                <button type="submit" id="tag-{{ tag.name }}">{{ tag.name }}</button>
             </form>
           {% endfor %}
           <form method="post" action="{% url 'youtuber_detail' youtuber.slug_name %}">
             {% csrf_token %}
             {{ tag_form.as_p }}
-            <button type="submit">Додати тег</button>
+            <button type="submit" id="submit-tag">Додати тег</button>
           </form>
         </p>
         <p class="card-text">{{ youtuber.channel_description }}</p>
