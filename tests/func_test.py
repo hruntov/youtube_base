@@ -131,6 +131,20 @@ class BasicInstallTest(unittest.TestCase):
 
         self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
 
+    def test_add_teg(self):
+        self.browser.get("http://localhost:8000/youtuber_list/serhiinemchynskyi/")
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '#tag')))
+        tag_input = self.browser.find_element(By.CSS_SELECTOR, '#id_tag')
+        submit_button = self.browser.find_element(By.CSS_SELECTOR, '#submit-tag')
+        tag_input.send_keys('test tag')
+        submit_button.submit()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//button[@id="tag-test tag"]')))
+        tag_text = self.browser.find_element(By.XPATH, '//button[@id="tag-test tag"]').text
+        self.assertIn('test tag', tag_text)
+
 
 if __name__ == "__main__":
     unittest.main()
