@@ -8,11 +8,12 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
+from taggit.models import Tag
 
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
@@ -148,9 +149,14 @@ class YoutuberList(ListView):
 
         """
         form = CategoryForm(request.POST)
+        tag_form = TagForm(request.POST)
+
         if form.is_valid():
             categories = form.cleaned_data['categories']
             youtubers = Youtuber.objects.filter(categories__in=categories)
+        elif tag_form.is_valid():
+            tag = tag_form.cleaned_data['tag']
+            youtubers = Youtuber.objects.filter(tags__name__in=[tag])
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
