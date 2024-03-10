@@ -264,21 +264,13 @@ class YoutuberDetailView(DetailView):
         context['youtuber'] = context.pop('object')
         context['form'] = CommentForm()
         context['comments'] = Comment.objects.filter(youtuber=context['youtuber']).order_by('-created_at')[:5]
+        context['tag_form'] = TagForm()
         return context
 
+
+class CommentAddView(View):
+    """A View for adding comments to a Youtuber."""
     def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests for the YoutuberDetailView. This method validates the submitted form
-        and saves the comment to the database.
-
-        Args:
-            request (HttpRequest): The request instance.
-
-        Returns:
-            (HttpResponse): The response instance. Either a redirect to the same page with the new
-                comment, or a redirect to the same page with an error message.
-
-        """
         youtuber = get_object_or_404(Youtuber, slug_name=kwargs.get('slug_name'))
         form = CommentForm(data=request.POST)
         if not request.user.is_authenticated:
@@ -294,6 +286,18 @@ class YoutuberDetailView(DetailView):
         else:
             messages.error(request, 'Будь-ласка введіть коректний коментар.')
             return redirect('youtuber_detail', slug_name=youtuber.slug_name)
+
+
+class TagAddView(View):
+    """A View for adding tags to a Youtuber."""
+    def post(self, request, *args, **kwargs):
+        youtuber = get_object_or_404(Youtuber, slug_name=kwargs.get('slug_name'))
+        tag_form = TagForm(request.POST)
+        if tag_form.is_valid():
+            tag_name = tag_form.cleaned_data['tag']
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            youtuber.tags.add(tag)
+        return redirect('youtuber_detail', slug_name=youtuber.slug_name)
 
 
 class CommentDeleteView(View):

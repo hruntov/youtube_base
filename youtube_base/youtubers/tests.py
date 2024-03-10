@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from .forms import CommentForm
 from .models import Category, Comment, Youtuber
-from .views import YoutuberDetailView, YoutuberList
+from .views import CommentAddView, YoutuberDetailView, YoutuberList
 
 
 class PaginationTest(TestCase):
@@ -55,27 +55,30 @@ class YoutuberDetailViewTest(TestCase):
         setattr(request, '_messages', messages)
         return request
 
-    def test_post_comment_authenticated(self):
+    def test_add_comment_authenticated(self):
         request = self._create_request('post', {'text': 'Test Comment'})
         request.user = self.user
 
-        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        view = CommentAddView.as_view()
+        response = view(request, slug_name=self.youtuber.slug_name)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(Comment.objects.first().text, 'Test Comment')
 
-    def test_post_comment_unauthenticated(self):
+    def test_add_comment_unauthenticated(self):
         request = self._create_request('post', {'text': 'Test Comment'})
         request.user = AnonymousUser()
 
-        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        view = CommentAddView.as_view()
+        response = view(request, slug_name=self.youtuber.slug_name)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 0)
 
-    def test_post_comment_invalid_form(self):
+    def test_add_comment_invalid_form(self):
         request = self._create_request('post', {'text': ''})
         request.user = self.user
 
-        response = self.view.post(request, slug_name=self.youtuber.slug_name)
+        view = CommentAddView.as_view()
+        response = view(request, slug_name=self.youtuber.slug_name)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 0)
