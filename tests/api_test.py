@@ -28,10 +28,10 @@ class TestYoutubeApi(unittest.TestCase):
 
     def test_extracting_data_from_url_type_3(self):
         """The third type of URL is in the format: "https://www.youtube.com/c/@{username}"""
-        api = YoutubeApi("https://www.youtube.com/c/@EnglishClass101")
+        api = YoutubeApi("https://www.youtube.com/c/@burgerchannel")
         api.get_channel_data()
-        self.assertEqual(api.channel_id, 'UCeTVoczn9NOZA9blls3YgUg')
-        self.assertEqual(api.channel_title, 'Learn English with EnglishClass101.com')
+        self.assertEqual(api.channel_id, 'UCVp3HrjsHf13z4wdV6jDMyw')
+        self.assertEqual(api.channel_title, 'Burger Channel')
         self.assertIsNotNone(api.channel_description)
 
 

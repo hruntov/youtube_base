@@ -35,8 +35,7 @@ jobs:
         run: |
           cd youtube_base && \
           poetry run python manage.py migrate && \
-          poetry run python manage.py loaddata youtubers/fixtures/categories.json && \
-          poetry run python manage.py loaddata youtubers/fixtures/youtubers.json && \
+          poetry run python manage.py loaddata youtubers/fixtures/data.json && \
           poetry run python manage.py loaddata users/fixtures/users.json
       - name: Run pytest
         run: |

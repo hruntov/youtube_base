@@ -8,11 +8,12 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
+from taggit.models import Tag
 
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
@@ -148,23 +149,43 @@ class YoutuberList(ListView):
 
         """
         form = CategoryForm(request.POST)
+        tag_form = TagForm(request.POST)
+
         if form.is_valid():
             categories = form.cleaned_data['categories']
             youtubers = Youtuber.objects.filter(categories__in=categories)
-
-            page = request.POST.get('page', 1)
-            youtubers_paginated = self._get_paginated_data(youtubers, page)
-
-            serializer = YoutuberSerializer(youtubers, many=True)
-            youtubers = serializer.data
-            request.session["youtubers"] = youtubers
-
-            return render(request,
-                          'youtubers/youtuber_list.html',
-                          {'youtubers': youtubers_paginated})
+        elif tag_form.is_valid():
+            tag = tag_form.cleaned_data['tag']
+            youtubers = Youtuber.objects.filter(tags__name__in=[tag])
         else:
             messages.error(request, 'Будь-ласка оберіть хоча б одну категорію.')
             return redirect('home')
+
+        return self.render_youtubers(request, youtubers)
+
+    def render_youtubers(self, request, youtubers):
+        """
+        Renders the 'youtubers/youtuber_list.html' template with the provided list of Youtubers.
+
+        Args:
+            request (HttpRequest): The request instance.
+            youtubers (QuerySet): The list of Youtubers to display.
+
+        Returns:
+            (HttpResponse): The response instance. A rendered template with the paginated list of
+                Youtubers.
+
+        """
+        page = request.POST.get('page', 1)
+        youtubers_paginated = self._get_paginated_data(youtubers, page)
+
+        serializer = YoutuberSerializer(youtubers, many=True)
+        youtubers = serializer.data
+        request.session["youtubers"] = youtubers
+
+        return render(request,
+                      'youtubers/youtuber_list.html',
+                      {'youtubers': youtubers_paginated})
 
     def get(self, request, *args, **kwargs):
         """
@@ -243,21 +264,13 @@ class YoutuberDetailView(DetailView):
         context['youtuber'] = context.pop('object')
         context['form'] = CommentForm()
         context['comments'] = Comment.objects.filter(youtuber=context['youtuber']).order_by('-created_at')[:5]
+        context['tag_form'] = TagForm()
         return context
 
+
+class CommentAddView(View):
+    """A View for adding comments to a Youtuber."""
     def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests for the YoutuberDetailView. This method validates the submitted form
-        and saves the comment to the database.
-
-        Args:
-            request (HttpRequest): The request instance.
-
-        Returns:
-            (HttpResponse): The response instance. Either a redirect to the same page with the new
-                comment, or a redirect to the same page with an error message.
-
-        """
         youtuber = get_object_or_404(Youtuber, slug_name=kwargs.get('slug_name'))
         form = CommentForm(data=request.POST)
         if not request.user.is_authenticated:
@@ -273,6 +286,18 @@ class YoutuberDetailView(DetailView):
         else:
             messages.error(request, 'Будь-ласка введіть коректний коментар.')
             return redirect('youtuber_detail', slug_name=youtuber.slug_name)
+
+
+class TagAddView(View):
+    """A View for adding tags to a Youtuber."""
+    def post(self, request, *args, **kwargs):
+        youtuber = get_object_or_404(Youtuber, slug_name=kwargs.get('slug_name'))
+        tag_form = TagForm(request.POST)
+        if tag_form.is_valid():
+            tag_name = tag_form.cleaned_data['tag']
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            youtuber.tags.add(tag)
+        return redirect('youtuber_detail', slug_name=youtuber.slug_name)
 
 
 class CommentDeleteView(View):

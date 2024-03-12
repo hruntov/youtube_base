@@ -76,3 +76,15 @@ class CommentForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit(name='submit', value='Відправити'))
+
+
+class TagForm(forms.Form):
+    """
+    A form used for filtering Youtubers by tag. If the form is filled out, the tag inputted is used
+    to filter the Youtubers displayed in the view.
+
+    Attributes:
+        tag (forms.CharField): A character field for inputting a tag.
+
+    """
+    tag = forms.CharField(max_length=255)

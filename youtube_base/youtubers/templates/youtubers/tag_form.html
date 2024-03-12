@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'add_tag' youtuber.slug_name %}">
+	{% csrf_token %}
+	{{ tag_form.as_p }}
+	<button type="submit" id="submit-tag">Додати тег</button>
+</form>
