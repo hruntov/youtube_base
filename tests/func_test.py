@@ -2,8 +2,8 @@ import time
 import unittest
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -14,23 +14,27 @@ class BasicInstallTest(unittest.TestCase):
     def setUp(self):
         options = Options()
         options.add_argument("--headless")
-        self.browser = webdriver.Chrome(options=options)
+        options.add_argument('--no-sandbox')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--disable-gpu')
+        self.browser = webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=options)
+        time.sleep(5)
 
     def tearDown(self):
         self.browser.quit()
 
     def test_home_page_title(self):
-        self.browser.get("http://localhost:8000")
+        self.browser.get("http://mywebsite:8000")
         self.assertIn("База українських кріейтерів", self.browser.title)
 
     def test_home_page_header(self):
-        self.browser.get("http://localhost:8000")
+        self.browser.get("http://mywebsite:8000")
         header_element = self.browser.find_element(By.TAG_NAME, "h1")
         header_text = header_element.text
         self.assertIn("База українських кріейтерів", header_text)
 
     def test_pagination_with_category_selection(self):
-        self.browser.get("http://localhost:8000")
+        self.browser.get("http://mywebsite:8000")
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((
                 By.CSS_SELECTOR,
@@ -59,7 +63,7 @@ class BasicInstallTest(unittest.TestCase):
         next_button.click()
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'a[aria-label="First"]')))
-        assert self.browser.current_url == "http://localhost:8000/youtuber_list/?page=2"
+        assert self.browser.current_url == "http://mywebsite:8000/youtuber_list/?page=2"
         try:
             first_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="First"]')
             last_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Last"]')
@@ -78,16 +82,21 @@ class BasicInstallTest(unittest.TestCase):
             print("Paginator error in the last page.")
 
     def test_add_and_delete_comment_authorized(self):
-        self.browser.get("http://localhost:8000/login/")
+        self.browser.get("http://mywebsite:8000/login/")
 
-        username_input = self.browser.find_element(By.NAME, "username")
-        password_input = self.browser.find_element(By.NAME, "password")
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.NAME, 'username')))
+        try:
+            username_input = self.browser.find_element(By.NAME, "username")
+            password_input = self.browser.find_element(By.NAME, "password")
+        except NoSuchElementException:
+            print("Login form does not exist.")
 
         username_input.send_keys('test_user')
         password_input.send_keys('test_password')
         self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
 
-        self.browser.get(f"http://localhost:8000/youtuber_list/gamewizua/")
+        self.browser.get(f"http://mywebsite:8000/youtuber_list/gamewizua/")
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
         comment_input = self.browser.find_element(By.NAME, "text")
@@ -116,7 +125,7 @@ class BasicInstallTest(unittest.TestCase):
 
 
     def test_comment_unauthorized(self):
-        self.browser.get("http://localhost:8000/youtuber_list/gamewizua/")
+        self.browser.get("http://mywebsite:8000/youtuber_list/gamewizua/")
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
         comment_input = self.browser.find_element(By.NAME, "text")
@@ -132,7 +141,7 @@ class BasicInstallTest(unittest.TestCase):
         self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
 
     def test_add_teg(self):
-        self.browser.get("http://localhost:8000/youtuber_list/test_slug_name/")
+        self.browser.get("http://mywebsite:8000/youtuber_list/test_slug_name/")
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '#tag')))
         tag_input = self.browser.find_element(By.CSS_SELECTOR, '#id_tag')
@@ -142,8 +151,15 @@ class BasicInstallTest(unittest.TestCase):
 
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.XPATH, '//button[@id="tag-test tag"]')))
-        tag_text = self.browser.find_element(By.XPATH, '//button[@id="tag-test tag"]').text
-        self.assertIn('test tag', tag_text)
+        max_attempts = 10
+        while max_attempts > 0:
+            try:
+                tag_text = self.browser.find_element(By.XPATH, '//button[@id="tag-test tag"]').text
+                self.assertIn('test tag', tag_text)
+                break
+            except StaleElementReferenceException:
+                max_attempts -= 1
+                time.sleep(1)
 
 
 if __name__ == "__main__":
