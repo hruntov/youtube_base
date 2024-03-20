@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 
+from .feeds import LatestYoutubersFeed
 from youtubers import views
 
 from .views import (AddYoutuberView, CommentDeleteView, HomeView, YoutuberDetailView)
@@ -17,4 +18,5 @@ urlpatterns = [
          name='add_comment'),
     path('comment/<int:id>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
     path('youtuber/<slug:slug_name>/add_tag/', views.TagAddView.as_view(), name='add_tag'),
+    path('feed/', LatestYoutubersFeed(), name='youtuber_feed'),
 ]
