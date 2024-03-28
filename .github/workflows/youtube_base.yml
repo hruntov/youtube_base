@@ -21,32 +21,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Create Docker network
-        run: docker network create mynetwork
-
-      - name: Run Selenium server in Docker
-        run: >
-          docker run -d -p 4444:4444 -p 7900:7900
-          --shm-size="2g"
-          --network=mynetwork
-          --name selenium
-          selenium/standalone-firefox:4.18.1-20240224
-
-      - name: Build Docker image
-        run: docker build -t mywebsite:tag .
-
-      - name: Run Docker container
-        run: >
-         docker run -d -p 8000:8000 -e "API_KEY=${{ secrets.API_KEY }}"
-         --network=mynetwork
-         --name mywebsite
-         mywebsite:tag
+      - name: Build and run Docker containers
+        run: docker-compose up -d
 
       - name: Execute tests
-        run: docker exec mywebsite poetry run pytest -v
+        run: docker-compose exec -T mywebsite poetry run pytest -v
 
       - name: Run users unit tests
-        run: docker exec mywebsite poetry run python youtube_base/manage.py test users
+        run: docker-compose exec -T mywebsite poetry run python youtube_base/manage.py test users
 
       - name: Run youtubers unit tests
-        run: docker exec mywebsite poetry run python youtube_base/manage.py test youtubers
+        run: docker-compose exec -T mywebsite poetry run python youtube_base/manage.py test youtubers
