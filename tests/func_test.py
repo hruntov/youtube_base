@@ -1,3 +1,4 @@
+import os
 import time
 import unittest
 
@@ -9,6 +10,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
+SELENIUM_SERVER_URL = os.environ.get('SELENIUM_SERVER_URL')
+MYWEBSITE_URL = os.environ.get("MYWEBSITE_URL")
+
+
 class BasicInstallTest(unittest.TestCase):
 
     def setUp(self):
@@ -17,23 +22,23 @@ class BasicInstallTest(unittest.TestCase):
         options.add_argument('--no-sandbox')
         options.add_argument('--window-size=1920,1080')
         options.add_argument('--disable-gpu')
-        self.browser = webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=options)
+        self.browser = webdriver.Remote(command_executor=SELENIUM_SERVER_URL, options=options)
 
     def tearDown(self):
         self.browser.quit()
 
     def test_home_page_title(self):
-        self.browser.get("http://mywebsite:8000")
+        self.browser.get(MYWEBSITE_URL)
         self.assertIn("База українських кріейтерів", self.browser.title)
 
     def test_home_page_header(self):
-        self.browser.get("http://mywebsite:8000")
+        self.browser.get(MYWEBSITE_URL)
         header_element = self.browser.find_element(By.TAG_NAME, "h1")
         header_text = header_element.text
         self.assertIn("База українських кріейтерів", header_text)
 
     def test_pagination_with_category_selection(self):
-        self.browser.get("http://mywebsite:8000")
+        self.browser.get(MYWEBSITE_URL)
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((
                 By.CSS_SELECTOR,
@@ -62,7 +67,7 @@ class BasicInstallTest(unittest.TestCase):
         next_button.click()
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'a[aria-label="First"]')))
-        assert self.browser.current_url == "http://mywebsite:8000/youtuber_list/?page=2"
+        assert self.browser.current_url == MYWEBSITE_URL + "/youtuber_list/?page=2"
         try:
             first_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="First"]')
             last_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Last"]')
@@ -81,7 +86,7 @@ class BasicInstallTest(unittest.TestCase):
             print("Paginator error in the last page.")
 
     def test_add_and_delete_comment_authorized(self):
-        self.browser.get("http://mywebsite:8000/login/")
+        self.browser.get(MYWEBSITE_URL + "/login/")
 
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.NAME, 'username')))
@@ -95,7 +100,7 @@ class BasicInstallTest(unittest.TestCase):
         password_input.send_keys('test_password')
         self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
 
-        self.browser.get(f"http://mywebsite:8000/youtuber_list/gamewizua/")
+        self.browser.get(MYWEBSITE_URL + "/youtuber_list/gamewizua/")
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
         comment_input = self.browser.find_element(By.NAME, "text")
@@ -124,7 +129,7 @@ class BasicInstallTest(unittest.TestCase):
 
 
     def test_comment_unauthorized(self):
-        self.browser.get("http://mywebsite:8000/youtuber_list/gamewizua/")
+        self.browser.get(MYWEBSITE_URL + "/youtuber_list/gamewizua/")
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
         comment_input = self.browser.find_element(By.NAME, "text")
@@ -140,7 +145,7 @@ class BasicInstallTest(unittest.TestCase):
         self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
 
     def test_add_teg(self):
-        self.browser.get("http://mywebsite:8000/youtuber_list/test_slug_name/")
+        self.browser.get(MYWEBSITE_URL + "/youtuber_list/test_slug_name/")
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '#tag')))
         tag_input = self.browser.find_element(By.CSS_SELECTOR, '#id_tag')

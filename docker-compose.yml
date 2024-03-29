@@ -21,6 +21,8 @@ services:
       - 8000:8000
     environment:
       - API_KEY=${API_KEY}
+      - SELENIUM_SERVER_URL=${SELENIUM_SERVER_URL}
+      - MYWEBSITE_URL=${MYWEBSITE_URL}
 
 networks:
   mynetwork:
