@@ -18,7 +18,6 @@ class BasicInstallTest(unittest.TestCase):
         options.add_argument('--window-size=1920,1080')
         options.add_argument('--disable-gpu')
         self.browser = webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=options)
-        time.sleep(5)
 
     def tearDown(self):
         self.browser.quit()
@@ -149,17 +148,13 @@ class BasicInstallTest(unittest.TestCase):
         tag_input.send_keys('test tag')
         submit_button.submit()
 
+        element_locator = (By.XPATH, '//button[@id="tag-test tag"]')
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//button[@id="tag-test tag"]')))
-        max_attempts = 10
-        while max_attempts > 0:
-            try:
-                tag_text = self.browser.find_element(By.XPATH, '//button[@id="tag-test tag"]').text
-                self.assertIn('test tag', tag_text)
-                break
-            except StaleElementReferenceException:
-                max_attempts -= 1
-                time.sleep(1)
+            EC.text_to_be_present_in_element(element_locator, 'test tag')
+        )
+        element = self.browser.find_element(*element_locator)
+        tag_text = element.text
+        self.assertIn('test tag', tag_text)
 
 
 if __name__ == "__main__":
