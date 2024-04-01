@@ -19,4 +19,5 @@ urlpatterns = [
     path('comment/<int:id>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
     path('youtuber/<slug:slug_name>/add_tag/', views.TagAddView.as_view(), name='add_tag'),
     path('feed/', LatestYoutubersFeed(), name='youtuber_feed'),
+    path('search/', views.youtuber_search, name='youtuber_search'),
 ]

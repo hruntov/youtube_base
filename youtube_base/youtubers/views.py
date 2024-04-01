@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.postgres.search import SearchVector
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,7 +14,7 @@ from taggit.models import Tag
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm, SearchForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
@@ -310,3 +311,37 @@ class CommentDeleteView(View):
         else:
             messages.error(request, 'Ви не можете видалити цей коментар.')
         return redirect('youtuber_detail', slug_name=comment.youtuber.slug_name)
+
+
+def youtuber_search(request):
+    """
+    Searches for YouTubers based on the provided query.
+
+    This function takes a query string as input and returns a list of YouTubers that match the
+    query. The search is performed based on the channel title and description.
+
+    Parameters:
+        query (str): The search query string.
+
+    Returns:
+        (HttpResponse): The response object containing the search results.
+
+    """
+    form = SearchForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            print(1)
+            query = form.cleaned_data['query']
+            results = Youtuber.objects.annotate(
+                search=SearchVector('channel_title', 'channel_description')
+            ).filter(search=query)
+
+    return render(request,
+                  'youtubers/search.html',
+                  {'form': form,
+                   'query': query,
+                   'results': results})
