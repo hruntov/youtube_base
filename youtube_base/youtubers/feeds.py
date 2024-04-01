@@ -17,12 +17,16 @@ class LatestYoutubersFeed(Feed):
         """Return the Youtuber objects that should be included in the feed."""
         return Youtuber.objects.all()[:5]
 
-    def link(self, item):
-        """Return the URL for the feed itself."""
+    def update_site_info(self):
+        """Update the current site's domain and name."""
         site = Site.objects.get_current()
         site.domain = os.environ.get('SITE_DOMAIN')
         site.name = os.environ.get('SITE_NAME')
         site.save()
+
+    def link(self, item):
+        """Return the URL for the feed itself."""
+        self.update_site_info()
 
         domain = Site.objects.get_current().domain
         link_list = 'http://' + domain + reverse_lazy('youtuber_list')
