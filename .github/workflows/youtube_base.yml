@@ -17,6 +17,9 @@ jobs:
       API_KEY: ${{ secrets.API_KEY }}
       SELENIUM_SERVER_URL: ${{ secrets.SELENIUM_SERVER_URL }}
       MYWEBSITE_URL: ${{ secrets.MYWEBSITE_URL }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
