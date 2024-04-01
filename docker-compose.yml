@@ -10,6 +10,19 @@ services:
       - 4444:4444
       - 7900:7900
 
+  db:
+    image: postgres:13
+    networks:
+      - mynetwork
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+    - 5432:5432
+
   mywebsite:
     build:
       context: .
@@ -23,6 +36,14 @@ services:
       - API_KEY=${API_KEY}
       - SELENIUM_SERVER_URL=${SELENIUM_SERVER_URL}
       - MYWEBSITE_URL=${MYWEBSITE_URL}
+    depends_on:
+      - db
+      - selenium
+    volumes:
+    - .:/website_wsl
 
 networks:
   mynetwork:
+
+volumes:
+  postgres_data:
