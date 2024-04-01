@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} Пошук {% endblock %}\
+
+{% block content %}
+    {% if query %}
+        <h1>Результати пошуку по запиту "{{ query }}"</h1>
+        <h4>
+            {% with results.count as total_results %}
+            {{ total_results }} результатів
+            {% endwith %}
+        </h4>
+        {% for youtuber in results %}
+            <h4>
+                <a href="{{ youtuber.absolute_url }}">{{ youtuber.channel_title }}</a>
+            </h4>
+            {{ youtuber.channel_description|truncatewords_html:12 }}
+        {% empty %}
+            <p>Нічого не знайдено</p>
+        {% endfor %}
+        <p><a href="{% url 'youtuber_search' %}" class="btn btn-primary">Шукати знов</a></p>
+    {% else %}
+        <h1>Знайдіть автора</h1>
+        <form method="get">
+            {{ form|crispy }}
+            <input type="submit" value="Пошук">
+        </form>
+    {% endif %}
+{% endblock %}
