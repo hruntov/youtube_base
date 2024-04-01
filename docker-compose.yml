@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  selenium:
+    image: selenium/standalone-firefox:4.18.1-20240224
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - mynetwork
+    ports:
+      - 4444:4444
+      - 7900:7900
+
+  mywebsite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mywebsite:tag
+    networks:
+      - mynetwork
+    ports:
+      - 8000:8000
+    environment:
+      - API_KEY=${API_KEY}
+      - SELENIUM_SERVER_URL=${SELENIUM_SERVER_URL}
+      - MYWEBSITE_URL=${MYWEBSITE_URL}
+
+networks:
+  mynetwork:
