@@ -9,6 +9,12 @@ services:
       - mynetwork
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
     ports:
       - 4444:4444
       - 7900:7900
@@ -25,6 +31,12 @@ services:
       - mynetwork
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
     ports:
     - 5432:5432
 
@@ -47,6 +59,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - selenium
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
     volumes:
     - .:/website_wsl
 
