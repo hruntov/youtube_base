@@ -98,4 +98,4 @@ class SearchForm(forms.Form):
         query (forms.CharField): A character field for inputting a search query.
 
     """
-    query = forms.CharField(label='Ваш запит')
+    query = forms.CharField(label='Your Label', widget=forms.TextInput(attrs={'id': 'search'}))
