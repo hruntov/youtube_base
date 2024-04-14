@@ -161,6 +161,31 @@ class BasicInstallTest(unittest.TestCase):
         tag_text = element.text
         self.assertIn('test tag', tag_text)
 
+    def test_search_channel(self):
+        self.browser.get(MYWEBSITE_URL + "/search/")
+
+        search_button_id = 'search'
+        channel_title_id = 'channel-title-1'
+        channel_description_id = 'channel-description-1'
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, search_button_id)))
+
+        search_input = self.browser.find_element(By.ID, search_button_id)
+        search_input.send_keys('test_channel_description')
+        search_button = self.browser.find_element(By.CSS_SELECTOR,
+                                                  'input[type="submit"][value="Пошук"]')
+        search_button.click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, channel_title_id)))
+
+        title_element = self.browser.find_element(By.ID, channel_title_id)
+        description_element = self.browser.find_element(By.ID, channel_description_id)
+
+        self.assertEqual(title_element.text, 'test_channel_title')
+        self.assertEqual(description_element.text, 'test_channel_description')
+
 
 if __name__ == "__main__":
     unittest.main()

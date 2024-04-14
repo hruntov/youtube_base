@@ -88,3 +88,14 @@ class TagForm(forms.Form):
 
     """
     tag = forms.CharField(max_length=255)
+
+
+class SearchForm(forms.Form):
+    """
+    A Django form used for searching Youtubers.
+
+    Attributes:
+        query (forms.CharField): A character field for inputting a search query.
+
+    """
+    query = forms.CharField(label='Your Label', widget=forms.TextInput(attrs={'id': 'search'}))
