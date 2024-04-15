@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -334,11 +334,13 @@ def youtuber_search(request):
     if 'query' in request.GET:
         form = SearchForm(request.GET)
         if form.is_valid():
-            print(1)
             query = form.cleaned_data['query']
+            search_vector = SearchVector('channel_title', weight='A') + \
+                SearchVector('channel_description', weight='B', config='russian')
+            search_query = SearchQuery(query, config='russian')
             results = Youtuber.objects.annotate(
-                search=SearchVector('channel_title', 'channel_description')
-            ).filter(search=query)
+                search=search_vector, rank=SearchRank(search_vector, search_query)
+            ).filter(rank__gte=0.3).order_by('-rank')
 
     return render(request,
                   'youtubers/search.html',
