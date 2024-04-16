@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView,PasswordChangeDoneView
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
 from .forms import ContactForm, RegistrationForm
 
@@ -33,7 +36,6 @@ def sign_up_view(request):
     return render(request, 'registration/sign_up.html', {'form': form})
 
 
-
 def contact_us(request):
     """View for handling the contact form submission. It sends an email with the form data."""
     if request.method == 'POST':
@@ -53,3 +55,17 @@ def contact_us(request):
     else:
         form = ContactForm()
     return render(request, 'contact_us.html', {'form': form})
+
+
+class MyPasswordChangeView(PasswordChangeView):
+    template_name = 'users/password_change_form.html'
+    success_url = reverse_lazy('password_change_done')
+
+
+class MyPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = 'users/password_change_done.html'
+
+
+@login_required
+def profile(request):
+    return render(request, 'users/profile.html')
