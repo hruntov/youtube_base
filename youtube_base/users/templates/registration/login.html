@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 
 {% block title %}
-    <title>Login</title>
+    <title>Увійти</title>
 {% endblock %}
 
 {% load crispy_forms_tags %}
 {% block content %}
-<form method="post">
-{% csrf_token %} {{ form|crispy }}
-<p>Don't have an account? Sign up here!<a href="/sign-up">Here</a></p>
-<button type="submit" class="btn-success">Login</button>
-</form>
+    <h1>Увійдіть:</h1>
+    {% if form.errors %}
+    <p>
+        Ваш логін чи пароль не правильний.
+        Спробуйте ще раз.
+    </p>
+    {% else %}
+        <p>Будь ласка, введіть ваші дані.</p>
+    {% endif %}
+
+    <div class='login-form'>
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %} {{ form|crispy }}
+            <input type='hidden' name='next' value='{{ next }}' />
+            <p>Немає акакута? <a href={% url 'sign_up' %}>Реєструйтесь!</a></p>
+            <button type="submit" class="btn-success" value="log_in">Увійти</button>
+        </form>
+    </div>
 {% endblock %}

@@ -33,20 +33,6 @@ def sign_up_view(request):
     return render(request, 'registration/sign_up.html', {'form': form})
 
 
-def logout_view(request):
-    """
-    View for user logout. It logs out the user and redirects to the home page.
-
-    Args:
-        request (HttpRequest): The request object.
-
-    Returns:
-        (HttpResponse): The response object.
-
-    """
-    logout(request)
-    return redirect('/')
-
 
 def contact_us(request):
     """View for handling the contact form submission. It sends an email with the form data."""
