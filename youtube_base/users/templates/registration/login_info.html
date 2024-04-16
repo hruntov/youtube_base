@@ -10,6 +10,6 @@
     <p>Don't have an account? Sign up <a href="{% url 'sign_up' %}">here</a>!</p>
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
-        <a href="{% url 'login' %}" class="btn btn-success">Ввійти</a>
+        <a href="{% url 'login' %}" class="btn btn-success">Увійти</a>
     </form>
 {% endif %}
