@@ -23,5 +23,10 @@
             <p>Немає акакута? <a href={% url 'sign_up' %}>Реєструйтесь!</a></p>
             <button type="submit" class="btn-success" value="log_in">Увійти</button>
         </form>
+        <p>
+            <a href="{% url 'password_reset' %}">
+                Забули пароль?
+            </a>
+        </p>
     </div>
 {% endblock %}

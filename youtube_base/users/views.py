@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import PasswordChangeView,PasswordChangeDoneView
+from django.contrib.auth.views import (PasswordChangeDoneView, PasswordChangeView,
+                                       PasswordResetCompleteView, PasswordResetConfirmView,
+                                       PasswordResetDoneView, PasswordResetView)
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -58,12 +60,34 @@ def contact_us(request):
 
 
 class MyPasswordChangeView(PasswordChangeView):
+    """View for changing the user's password."""
     template_name = 'users/password_change_form.html'
     success_url = reverse_lazy('password_change_done')
 
 
 class MyPasswordChangeDoneView(PasswordChangeDoneView):
+    """View displayed after the user's password has been changed."""
     template_name = 'users/password_change_done.html'
+
+
+class MyPasswordResetView(PasswordResetView):
+    """View for resetting the user's password."""
+    template_name = 'users/password_reset_form.html'
+
+
+class MyPasswordResetDoneView(PasswordResetDoneView):
+    """View displayed after the password reset email has been sent."""
+    template_name = 'users/password_reset_done.html'
+
+
+class MyPasswordResetConfirmView(PasswordResetConfirmView):
+    """View for confirming the new password during a password reset."""
+    template_name = 'users/password_reset_confirm.html'
+
+
+class MyPasswordResetCompleteView(PasswordResetCompleteView):
+    """View displayed after the user's password has been reset."""
+    template_name = 'users/password_reset_complete.html'
 
 
 @login_required
