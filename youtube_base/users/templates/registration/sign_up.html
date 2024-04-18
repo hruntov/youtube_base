@@ -8,7 +8,7 @@
 {% block content %}
 <form method="post">
 {% csrf_token %} {{ form|crispy }}
-<p>Have an account? Login!<a href="/login">Here</a></p>
+<p>Маєш акакунт? <a href="/login">Заходь!</a></p>
 <button type="submit" class="btn-success">Register</button>
 </form>
 {% endblock %}
