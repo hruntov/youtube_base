@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (PasswordChangeDoneView, PasswordChangeView,
                                        PasswordResetCompleteView, PasswordResetConfirmView,
                                        PasswordResetDoneView, PasswordResetView)
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
-from .forms import ContactForm, RegistrationForm
+from .forms import ContactForm, ProfileForm, RegistrationForm
+from .models import Profile
 
 
 def sign_up_view(request):
@@ -30,6 +32,7 @@ def sign_up_view(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Profile.objects.create(user=user)
             login(request, user)
             return redirect('/')
     else:
@@ -92,4 +95,14 @@ class MyPasswordResetCompleteView(PasswordResetCompleteView):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш профіль оновлено.')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Не вдалося оновити ваш профіль.')
+    else:
+        form = ProfileForm(instance=request.user.profile)
+    return render(request, 'users/profile.html', {'form': form})
