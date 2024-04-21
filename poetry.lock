@@ -856,6 +856,21 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-rerunfailures"
+version = "14.0"
+description = "pytest plugin to re-run tests to eliminate flaky failures"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest-rerunfailures-14.0.tar.gz", hash = "sha256:4a400bcbcd3c7a4ad151ab8afac123d90eca3abe27f98725dc4d9702887d2e92"},
+    {file = "pytest_rerunfailures-14.0-py3-none-any.whl", hash = "sha256:4197bdd2eaeffdbf50b5ea6e7236f47ff0e44d1def8dae08e409f536d84e7b32"},
+]
+
+[package.dependencies]
+packaging = ">=17.1"
+pytest = ">=7.2"
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -1111,4 +1126,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ca800354a0d267950ff556b6da449228c648696749742c5feb945f0fbdfca413"
+content-hash = "8721226361965027af3c13cc6f525595ca9bc19ab4f69599108d493936517001"

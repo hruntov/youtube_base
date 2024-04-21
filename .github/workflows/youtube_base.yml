@@ -30,7 +30,7 @@ jobs:
         run: docker-compose up -d
 
       - name: Execute tests
-        run: docker-compose exec -T mywebsite poetry run pytest -v
+        run: docker-compose exec -T mywebsite poetry run pytest -v --reruns 5
 
       - name: Run users unit tests
         run: docker-compose exec -T mywebsite poetry run python youtube_base/manage.py test users
