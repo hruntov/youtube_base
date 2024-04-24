@@ -39,60 +39,79 @@ class BasicInstallTest(unittest.TestCase):
 
     def test_pagination_with_category_selection(self):
         self.browser.get(MYWEBSITE_URL)
+
+        checkboxes_element_name = 'categories'
+        search_button_element_css = 'button.btn.btn-primary[type="submit"]'
+        next_button_element_css = 'a[aria-label="Next"]'
+        first_button_element_css = 'a[aria-label="First"]'
+        last_button_element_css = 'a[aria-label="Last"]'
+        previous_button_element_css = 'a[aria-label="Previous"]'
+
+
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((
                 By.CSS_SELECTOR,
-                'button.btn.btn-primary[type="submit"]')))
+                search_button_element_css)))
 
         checkboxes = WebDriverWait(self.browser, 10).until(
-            EC.presence_of_all_elements_located((By.NAME, 'categories'))
+            EC.presence_of_all_elements_located((By.NAME, checkboxes_element_name))
         )
 
-        checkboxes = self.browser.find_elements(By.NAME, 'categories')
+        checkboxes = self.browser.find_elements(By.NAME, checkboxes_element_name)
         for checkbox in checkboxes[:5]:
             checkbox.click()
 
         search_button = self.browser.find_element(By.CSS_SELECTOR,
-                                                  'button.btn.btn-primary[type="submit"]')
+                                                  search_button_element_css)
 
         search_button.submit()
         WebDriverWait(self.browser, 20).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'a[aria-label="Next"]')))
+            EC.presence_of_element_located((By.CSS_SELECTOR, next_button_element_css)))
         try:
-            next_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Next"]')
-            last_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Last"]')
+            next_button = self.browser.find_element(By.CSS_SELECTOR, next_button_element_css)
+            last_button = self.browser.find_element(By.CSS_SELECTOR, last_button_element_css)
         except NoSuchElementException:
             print("Paginator error in the First page.")
 
         next_button.click()
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'a[aria-label="First"]')))
+            EC.presence_of_element_located((By.CSS_SELECTOR, first_button_element_css)))
         assert self.browser.current_url == MYWEBSITE_URL + "/youtuber_list/?page=2"
         try:
-            first_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="First"]')
-            last_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Last"]')
-            previous_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Previous"]')
-            next_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Next"]')
+            first_button = self.browser.find_element(By.CSS_SELECTOR, first_button_element_css)
+            last_button = self.browser.find_element(By.CSS_SELECTOR, last_button_element_css)
+            previous_button = self.browser.find_element(By.CSS_SELECTOR,
+                                                        previous_button_element_css)
+            next_button = self.browser.find_element(By.CSS_SELECTOR, next_button_element_css)
         except NoSuchElementException:
             print("Paginator error in the second page.")
 
         last_button.click()
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'a[aria-label="First"]')))
+            EC.presence_of_element_located((By.CSS_SELECTOR, first_button_element_css)))
         try:
-            first_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="First"]')
-            previous_button = self.browser.find_element(By.CSS_SELECTOR, 'a[aria-label="Previous"]')
+            first_button = self.browser.find_element(By.CSS_SELECTOR, first_button_element_css)
+            previous_button = self.browser.find_element(By.CSS_SELECTOR,
+                                                        previous_button_element_css)
         except NoSuchElementException:
             print("Paginator error in the last page.")
 
     def test_add_and_delete_comment_authorized(self):
         self.browser.get(MYWEBSITE_URL + "/login/")
 
+        username_input_element_name = "username"
+        password_input_element_name = "password"
+        comment_input_element_name = "text"
+        test_card_element_id = 'comment-1'
+        delete_button_element_id = 'delete-comment-button'
+        success_message_element_class = 'alert-success'
+        test_comment_text = 'This is a test comment'
+
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.NAME, 'username')))
+            EC.presence_of_element_located((By.NAME, username_input_element_name)))
         try:
-            username_input = self.browser.find_element(By.NAME, "username")
-            password_input = self.browser.find_element(By.NAME, "password")
+            username_input = self.browser.find_element(By.NAME, username_input_element_name)
+            password_input = self.browser.find_element(By.NAME, password_input_element_name)
         except NoSuchElementException:
             print("Login form does not exist.")
 
@@ -102,64 +121,73 @@ class BasicInstallTest(unittest.TestCase):
 
         self.browser.get(MYWEBSITE_URL + "/youtuber_list/gamewizua/")
 
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
-        comment_input = self.browser.find_element(By.NAME, "text")
-        comment_input.send_keys('This is a test comment')
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.NAME,comment_input_element_name)))
+        comment_input = self.browser.find_element(By.NAME, comment_input_element_name)
+        comment_input.send_keys(test_comment_text)
         send_button = self.browser.find_element(By.XPATH, '//button[text()="Додати коментар"]')
         send_button.click()
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, 'comment-1')))
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID,test_card_element_id)))
 
-        test_card = self.browser.find_element(By.ID, 'comment-1')
+        test_card = self.browser.find_element(By.ID, test_card_element_id)
         comment_text = test_card.find_element(By.CSS_SELECTOR, '.card-text').text
 
-        self.assertEqual(comment_text, 'This is a test comment')
+        self.assertEqual(comment_text, test_comment_text)
 
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.ID, 'delete-comment-button')))
-        delete_button = self.browser.find_element(By.ID, 'delete-comment-button')
+            EC.presence_of_element_located((By.ID, delete_button_element_id)))
+        delete_button = self.browser.find_element(By.ID, delete_button_element_id)
         delete_button.click()
 
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'alert-success')))
-        success_message = self.browser.find_element(By.CLASS_NAME, 'alert-success').text
+            EC.presence_of_element_located((By.CLASS_NAME, success_message_element_class)))
+        success_message = self.browser.find_element(
+            By.CLASS_NAME, success_message_element_class).text
         self.assertEqual(success_message, 'Коментар видалено.')
 
         with self.assertRaises(NoSuchElementException):
-            self.browser.find_element(By.XPATH, "//*[contains(text(), 'This is a test comment')]")
-
+            self.browser.find_element(By.XPATH, f"//*[contains(text(), '{test_comment_text}')]")
 
     def test_comment_unauthorized(self):
         self.browser.get(MYWEBSITE_URL + "/youtuber_list/gamewizua/")
 
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "text")))
-        comment_input = self.browser.find_element(By.NAME, "text")
+        comment_input_element_name = 'text'
+        error_message_element_class = 'alert-danger'
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.NAME, comment_input_element_name)))
+        comment_input = self.browser.find_element(By.NAME, comment_input_element_name)
         comment_input.send_keys('This is a test comment')
         send_button = self.browser.find_element(By.XPATH, '//button[text()="Додати коментар"]')
         send_button.click()
 
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'alert-danger')))
+            EC.presence_of_element_located((By.CLASS_NAME, error_message_element_class)))
 
-        error_message = self.browser.find_element(By.CLASS_NAME, 'alert-danger').text
+        error_message = self.browser.find_element(By.CLASS_NAME, error_message_element_class).text
 
         self.assertEqual(error_message, 'Будь-ласка увійдіть, щоб залишити коментар.')
 
-    def test_add_teg(self):
+    def test_add_tag(self):
         self.browser.get(MYWEBSITE_URL + "/youtuber_list/test_slug_name/")
+
+        test_tag_text = 'test tag'
+
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '#tag')))
         tag_input = self.browser.find_element(By.CSS_SELECTOR, '#id_tag')
         submit_button = self.browser.find_element(By.CSS_SELECTOR, '#submit-tag')
-        tag_input.send_keys('test tag')
+        tag_input.send_keys(test_tag_text)
         submit_button.submit()
 
         element_locator = (By.XPATH, '//button[@id="tag-test tag"]')
         WebDriverWait(self.browser, 10).until(
-            EC.text_to_be_present_in_element(element_locator, 'test tag')
+            EC.text_to_be_present_in_element(element_locator, test_tag_text)
         )
         element = self.browser.find_element(*element_locator)
-        tag_text = element.text
-        self.assertIn('test tag', tag_text)
+        element_tag_text = element.text
+        self.assertIn(test_tag_text, element_tag_text)
 
     def test_search_channel(self):
         self.browser.get(MYWEBSITE_URL + "/search/")
