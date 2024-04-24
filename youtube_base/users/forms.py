@@ -33,6 +33,7 @@ class ContactForm(forms.Form):
 
 
 class ProfileForm(forms.ModelForm):
+    """A Django form for the Profile model."""
     class Meta:
         model = Profile
         fields = ('date_of_birth', 'image')
