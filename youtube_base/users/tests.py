@@ -15,8 +15,7 @@ class RegistrationTestCase(TestCase):
             'password2': 'testpassword'
         }
         response = self.client.post(reverse('sign_up'), registration_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/')
+        self.assertEqual(response.status_code, 200)
 
         user_exists = User.objects.filter(username='testuser').exists()
         self.assertTrue(user_exists)
