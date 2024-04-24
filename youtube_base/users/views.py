@@ -1,8 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import (PasswordChangeDoneView, PasswordChangeView,
+                                       PasswordResetCompleteView, PasswordResetConfirmView,
+                                       PasswordResetDoneView, PasswordResetView)
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
-from .forms import ContactForm, RegistrationForm
+from .forms import ContactForm, ProfileForm, RegistrationForm
+from .models import Profile
 
 
 def sign_up_view(request):
@@ -25,27 +32,13 @@ def sign_up_view(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Profile.objects.create(user=user)
             login(request, user)
             return redirect('/')
     else:
         form = RegistrationForm()
 
     return render(request, 'registration/sign_up.html', {'form': form})
-
-
-def logout_view(request):
-    """
-    View for user logout. It logs out the user and redirects to the home page.
-
-    Args:
-        request (HttpRequest): The request object.
-
-    Returns:
-        (HttpResponse): The response object.
-
-    """
-    logout(request)
-    return redirect('/')
 
 
 def contact_us(request):
@@ -67,3 +60,49 @@ def contact_us(request):
     else:
         form = ContactForm()
     return render(request, 'contact_us.html', {'form': form})
+
+
+class MyPasswordChangeView(PasswordChangeView):
+    """View for changing the user's password."""
+    template_name = 'users/password_change_form.html'
+    success_url = reverse_lazy('password_change_done')
+
+
+class MyPasswordChangeDoneView(PasswordChangeDoneView):
+    """View displayed after the user's password has been changed."""
+    template_name = 'users/password_change_done.html'
+
+
+class MyPasswordResetView(PasswordResetView):
+    """View for resetting the user's password."""
+    template_name = 'users/password_reset_form.html'
+
+
+class MyPasswordResetDoneView(PasswordResetDoneView):
+    """View displayed after the password reset email has been sent."""
+    template_name = 'users/password_reset_done.html'
+
+
+class MyPasswordResetConfirmView(PasswordResetConfirmView):
+    """View for confirming the new password during a password reset."""
+    template_name = 'users/password_reset_confirm.html'
+
+
+class MyPasswordResetCompleteView(PasswordResetCompleteView):
+    """View displayed after the user's password has been reset."""
+    template_name = 'users/password_reset_complete.html'
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш профіль оновлено.')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Не вдалося оновити ваш профіль.')
+    else:
+        form = ProfileForm(instance=request.user.profile)
+    return render(request, 'users/profile.html', {'form': form})

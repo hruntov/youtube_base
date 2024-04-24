@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>Ваш профіль</title>
+{% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% for field in form %}
+        <form method='post' enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ field|as_crispy_field }}
+            <button type="submit" class="btn-success" value="Send e-mail">Зберегти</button>
+        </form>
+    {% endfor %}
+    <a href="{% url 'password_change' %}">Change Password</a>
+{% endblock %}
