@@ -33,8 +33,11 @@ def sign_up_view(request):
         if form.is_valid():
             user = form.save()
             Profile.objects.create(user=user)
-            login(request, user)
-            return redirect('/')
+            user = authenticate(request,
+                                username=user.username,
+                                password=form.cleaned_data.get('password1'))
+            if user is not None:
+                login(request, user)
     else:
         form = RegistrationForm()
 

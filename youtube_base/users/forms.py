@@ -18,6 +18,13 @@ class RegistrationForm(UserCreationForm):
                   'password1',
                   'password2')
 
+    def clean_email(self):
+        """Validate the email field."""
+        data = self.cleaned_data['email']
+        if User.objects.filter(email=data).exists():
+            raise forms.ValidationError('Email already in use.')
+        return data
+
 
 class ContactForm(forms.Form):
     """A form for contacting the site administrators."""
@@ -34,11 +41,32 @@ class ContactForm(forms.Form):
 
 class ProfileForm(forms.ModelForm):
     """A Django form for the Profile model."""
+    email = forms.EmailField()
+
     class Meta:
         model = Profile
-        fields = ('date_of_birth', 'image')
+        fields = ('date_of_birth', 'image', 'email')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['date_of_birth'].label = "Дата народження"
         self.fields['image'].label = "Аватар"
+        if self.instance.pk:
+            self.fields['email'].initial = self.instance.user.email
+
+    def save(self, commit=True):
+        """Overridden save method for the ProfileForm."""
+        profile = super().save(commit=False)
+        profile.user.email = self.cleaned_data['email']
+        profile.user.save()
+        if commit:
+            profile.save()
+        return profile
+
+    def clean_email(self):
+        """Validate the email field."""
+        email_data = self.cleaned_data['email']
+        email = User.objects.exclude(id=self.instance.id).filter(email=email_data)
+        if email.exists():
+            raise forms.ValidationError('Email already in use')
+        return email_data
