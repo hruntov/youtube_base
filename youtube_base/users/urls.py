@@ -20,5 +20,6 @@ urlpatterns = [
     path('password_reset/complete', views.MyPasswordResetCompleteView.as_view(),
          name='password_reset_complete'),
     path('profile', views.profile, name='profile'),
+    path('social_auth/', include('social_django.urls', namespace='social')),
 
 ]
