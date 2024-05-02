@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'taggit',
     'social_django',
+    'django_extensions',
 ]
 
 AUTHENTICATION_BACKENDS = [

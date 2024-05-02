@@ -347,6 +347,20 @@ files = [
 django = ">=4.2"
 
 [[package]]
+name = "django-extensions"
+version = "3.2.3"
+description = "Extensions for Django"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "django-extensions-3.2.3.tar.gz", hash = "sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a"},
+    {file = "django_extensions-3.2.3-py3-none-any.whl", hash = "sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "django-taggit"
 version = "5.0.1"
 description = "django-taggit is a reusable Django application for simple tagging."
@@ -1301,4 +1315,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "199f97fdf36527ab8829c2153dad557ce0408edc3b8347dd4d31719b23b15fdc"
+content-hash = "14d134774da3bdea25de611fec21db8571b8dcc0a10fee45a25350571f1ad7dd"
