@@ -175,7 +175,7 @@ class BasicInstallTest(unittest.TestCase):
         test_tag_text = 'test tag'
 
         WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '#tag')))
+            EC.presence_of_element_located((By.CSS_SELECTOR, '#id_tag')))
         tag_input = self.browser.find_element(By.CSS_SELECTOR, '#id_tag')
         submit_button = self.browser.find_element(By.CSS_SELECTOR, '#submit-tag')
         tag_input.send_keys(test_tag_text)
