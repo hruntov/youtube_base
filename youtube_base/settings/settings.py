@@ -44,15 +44,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+    'django.contrib.postgres',
+
     'crispy_bootstrap4',
     'crispy_forms',
     'youtubers',
     'users',
     'rest_framework',
     'taggit',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
-    'django.contrib.postgres',
+    'social_django',
 ]
 
 AUTHENTICATION_BACKENDS = [
