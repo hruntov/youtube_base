@@ -1,1 +1,0 @@
-[{"model": "taggit.tag", "pk": 26, "fields": {"name": "old_tag", "slug": "old_tag"}}, {"model": "taggit.taggeditem", "pk": 4, "fields": {"tag": 26, "content_type": 8, "object_id": 24}}]
