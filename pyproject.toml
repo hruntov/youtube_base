@@ -30,6 +30,7 @@ pillow = "^10.3.0"
 pytest-rerunfailures = "^14.0"
 social-auth-app-django = "^5.4.1"
 django-extensions = "^3.2.3"
+werkzeug = "^3.0.2"
 
 [tool.poetry.dependencies.windows-curses]
 version = "^2.3.2"
