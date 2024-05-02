@@ -108,3 +108,29 @@ main {
 .facebook a:hover {
     color: #f2f2f2;
 }
+
+.google {
+    display: inline-block;
+    background-color: #FF0000;
+    border-radius: 4px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.google:hover {
+    background-color: #B30000;
+    color: #f2f2f2;
+}
+
+.google a {
+    color: #f2f2f2;
+}
+
+.google a:hover {
+    color: #f2f2f2;
+}
