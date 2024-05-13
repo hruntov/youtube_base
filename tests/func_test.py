@@ -244,6 +244,79 @@ class BasicInstallTest(unittest.TestCase):
         self.assertEqual(title_element.text, 'test_channel_title')
         self.assertEqual(description_element.text, 'test_channel_description')
 
+    def test_profile_fields_changes(self):
+        data_authorization = self.data_authorization
+
+        test_user = data_authorization['test_username']
+        test_password = data_authorization['test_password']
+        username_input_element_name = data_authorization['username_input_element_name']
+        password_input_element_name = data_authorization['password_input_element_name']
+
+        self.browser.get(MYWEBSITE_URL + "/login/")
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.NAME, username_input_element_name)))
+        try:
+            username_field = self.browser.find_element(By.NAME, username_input_element_name)
+            password_field = self.browser.find_element(By.NAME, password_input_element_name)
+        except NoSuchElementException:
+            print("Login form does not exist.")
+
+        username_field.send_keys(test_user)
+        password_field.send_keys(test_password)
+        self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+
+        self.browser.get(MYWEBSITE_URL + "/profile")
+
+        assert self.browser.current_url == MYWEBSITE_URL + "/profile"
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, 'id_date_of_birth')))
+
+        date_of_birth_field = self.browser.find_element(By.ID, 'id_date_of_birth')
+        image_field = self.browser.find_element(By.CSS_SELECTOR, '#div_id_image a')
+        email_field = self.browser.find_element(By.ID, 'id_email')
+
+        assert date_of_birth_field.get_attribute('value') == '01.01.1990'
+        assert image_field.get_attribute('href').endswith('/test_user.jpg')
+        assert email_field.get_attribute('value') == 'test@test.com'
+
+        date_of_birth_field.clear()
+        date_of_birth_field.send_keys('02.02.1992')
+
+        self.browser.find_element(By.XPATH, '//button[text()="Зберегти"]').click()
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.ID, 'id_date_of_birth')))
+
+        date_of_birth_field = self.browser.find_element(By.ID, 'id_date_of_birth')
+        email_field = self.browser.find_element(By.ID, 'id_email')
+
+        assert date_of_birth_field.get_attribute('value') == '02.02.1992'
+        assert email_field.get_attribute('value') == 'test@test.com'
+
+        email_field.clear()
+        email_field.send_keys('test1@test.com')
+        self.browser.find_element(By.XPATH, '//button[text()="Зберегти"]').click()
+
+        date_of_birth_field = self.browser.find_element(By.ID, 'id_date_of_birth')
+        email_field = self.browser.find_element(By.ID, 'id_email')
+
+        assert date_of_birth_field.get_attribute('value') == '02.02.1992'
+        assert email_field.get_attribute('value') == 'test1@test.com'
+
+        email_field.clear()
+        date_of_birth_field.clear()
+        email_field.send_keys('test@test.com')
+        date_of_birth_field.send_keys('01.01.1990')
+        self.browser.find_element(By.XPATH, '//button[text()="Зберегти"]').click()
+
+        date_of_birth_field = self.browser.find_element(By.ID, 'id_date_of_birth')
+        email_field = self.browser.find_element(By.ID, 'id_email')
+
+        assert date_of_birth_field.get_attribute('value') == '01.01.1990'
+        assert email_field.get_attribute('value') == 'test@test.com'
+
 
 if __name__ == "__main__":
     unittest.main()
