@@ -27,6 +27,30 @@ class BasicInstallTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    @classmethod
+    def setUpClass(cls):
+        cls.data_authorization = {
+            "test_username": "test_user",
+            "test_password": "test_password",
+            "username_input_element_name": "username",
+            "password_input_element_name": "password",
+        }
+        cls.data_comments = {
+            "comment_input_element_name": "text",
+            "test_card_element_id": 'comment-1',
+            "delete_button_element_id": 'delete-comment-button',
+            "success_message_element_class": 'alert-success',
+            "test_comment_text": 'This is a test comment'
+        }
+        cls.data_pagination = {
+            "checkboxes_element_name": 'categories',
+            "search_button_element_css": 'button.btn.btn-primary[type="submit"]',
+            "next_button_element_css": 'a[aria-label="Next"]',
+            "first_button_element_css": 'a[aria-label="First"]',
+            "last_button_element_css": 'a[aria-label="Last"]',
+            "previous_button_element_css": 'a[aria-label="Previous"]',
+        }
+
     def test_home_page_title(self):
         self.browser.get(MYWEBSITE_URL)
         self.assertIn("База українських кріейтерів", self.browser.title)
@@ -38,15 +62,16 @@ class BasicInstallTest(unittest.TestCase):
         self.assertIn("База українських кріейтерів", header_text)
 
     def test_pagination_with_category_selection(self):
+        data_pagination = self.data_pagination
+
+        checkboxes_element_name = data_pagination['checkboxes_element_name']
+        search_button_element_css = data_pagination['search_button_element_css']
+        next_button_element_css = data_pagination['next_button_element_css']
+        first_button_element_css = data_pagination['first_button_element_css']
+        last_button_element_css = data_pagination['last_button_element_css']
+        previous_button_element_css = data_pagination['previous_button_element_css']
+
         self.browser.get(MYWEBSITE_URL)
-
-        checkboxes_element_name = 'categories'
-        search_button_element_css = 'button.btn.btn-primary[type="submit"]'
-        next_button_element_css = 'a[aria-label="Next"]'
-        first_button_element_css = 'a[aria-label="First"]'
-        last_button_element_css = 'a[aria-label="Last"]'
-        previous_button_element_css = 'a[aria-label="Previous"]'
-
 
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((
@@ -97,15 +122,20 @@ class BasicInstallTest(unittest.TestCase):
             print("Paginator error in the last page.")
 
     def test_add_and_delete_comment_authorized(self):
-        self.browser.get(MYWEBSITE_URL + "/login/")
+        data_authorization = self.data_authorization
+        data_comments = self.data_comments
 
-        username_input_element_name = "username"
-        password_input_element_name = "password"
-        comment_input_element_name = "text"
-        test_card_element_id = 'comment-1'
-        delete_button_element_id = 'delete-comment-button'
-        success_message_element_class = 'alert-success'
-        test_comment_text = 'This is a test comment'
+        test_user = data_authorization['test_username']
+        test_password = data_authorization['test_password']
+        username_input_element_name = data_authorization['username_input_element_name']
+        password_input_element_name = data_authorization['password_input_element_name']
+        comment_input_element_name = data_comments['comment_input_element_name']
+        test_card_element_id = data_comments['test_card_element_id']
+        delete_button_element_id = data_comments['delete_button_element_id']
+        success_message_element_class = data_comments['success_message_element_class']
+        test_comment_text = data_comments['test_comment_text']
+
+        self.browser.get(MYWEBSITE_URL + "/login/")
 
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located((By.NAME, username_input_element_name)))
@@ -115,8 +145,8 @@ class BasicInstallTest(unittest.TestCase):
         except NoSuchElementException:
             print("Login form does not exist.")
 
-        username_input.send_keys('test_user')
-        password_input.send_keys('test_password')
+        username_input.send_keys(test_user)
+        password_input.send_keys(test_password)
         self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
 
         self.browser.get(MYWEBSITE_URL + "/youtuber_list/gamewizua/")
