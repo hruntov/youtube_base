@@ -59,7 +59,7 @@ class ProfileForm(forms.ModelForm):
         profile = super().save(commit=False)
         profile.user.email = self.cleaned_data['email']
         profile.user.save()
-        if commit:
+        if commit and self.has_changed():
             profile.save()
         return profile
 
