@@ -13,12 +13,10 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% for field in form %}
-        <form method='post' enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ field|as_crispy_field }}
-            <button type="submit" class="btn-success" value="Send e-mail">Зберегти</button>
-        </form>
-    {% endfor %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Зберегти</button>
+    </form>
     <a href="{% url 'password_change' %}">Change Password</a>
 {% endblock %}

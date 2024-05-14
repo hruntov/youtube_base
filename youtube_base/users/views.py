@@ -100,7 +100,7 @@ class MyPasswordResetCompleteView(PasswordResetCompleteView):
 def profile(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
+        if form.is_valid() and form.has_changed():
             form.save()
             messages.success(request, 'Ваш профіль оновлено.')
             return redirect('profile')
