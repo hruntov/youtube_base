@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -347,3 +348,25 @@ def youtuber_search(request):
                   {'form': form,
                    'query': query,
                    'results': results})
+
+
+@login_required
+def manage_subscribe(request, youtuber_id):
+    """
+    Handles the subscription and unsubscription of a user to a Youtuber.
+
+    Args:
+        request (HttpRequest): The request object.
+        youtuber_id (int): The ID of the Youtuber.
+
+    Returns:
+        HttpResponseRedirect: A redirect to the Youtuber's detail page.
+
+    """
+    youtuber = get_object_or_404(Youtuber, id=youtuber_id)
+    if youtuber in request.user.profile.subscriptions.all():
+        request.user.profile.subscriptions.remove(youtuber)
+    else:
+        request.user.profile.subscriptions.add(youtuber)
+
+    return redirect('youtuber_detail', slug_name=youtuber.slug_name)

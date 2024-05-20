@@ -4,6 +4,16 @@
   <div class="container">
     <div class="card">
       <div class="card-body">
+        {% if user.is_authenticated %}
+          <form method="POST" action="{% url 'manage_subscribe' youtuber.id %}">
+            {% csrf_token %}
+            {% if youtuber in user.profile.subscriptions.all %}
+              <button type="submit" class="btn btn-danger">Відписатись</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Підписатись на канал</button>
+            {% endif %}
+          </form>
+        {% endif %}
         <h1 class="card-title">{{ youtuber.channel_title }}</h1>
         <p class="tags">Tags:
           {% for tag in youtuber.tags.all %}
