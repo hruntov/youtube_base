@@ -108,4 +108,6 @@ def profile(request):
             messages.error(request, 'Не вдалося оновити ваш профіль.')
     else:
         form = ProfileForm(instance=request.user.profile)
-    return render(request, 'users/profile.html', {'form': form})
+
+    subscriptions = request.user.profile.subscriptions.all()
+    return render(request, 'users/profile.html', {'form': form, 'subscriptions': subscriptions})
