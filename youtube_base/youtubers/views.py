@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -15,7 +15,7 @@ from taggit.models import Tag
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm, SearchForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, SearchForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
