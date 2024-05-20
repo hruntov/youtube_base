@@ -1,10 +1,8 @@
+from django.conf import settings
 from django.contrib import admin
+from django.db import models
 
 from .models import Profile
-
-
-from django.conf import settings
-from django.db import models
 
 
 class ProfileAdmin(admin.ModelAdmin):

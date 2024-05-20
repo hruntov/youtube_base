@@ -1,9 +1,9 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (PasswordChangeDoneView, PasswordChangeView,
                                        PasswordResetCompleteView, PasswordResetConfirmView,
                                        PasswordResetDoneView, PasswordResetView)
-from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -108,4 +108,6 @@ def profile(request):
             messages.error(request, 'Не вдалося оновити ваш профіль.')
     else:
         form = ProfileForm(instance=request.user.profile)
-    return render(request, 'users/profile.html', {'form': form})
+
+    subscriptions = request.user.profile.subscriptions.all()
+    return render(request, 'users/profile.html', {'form': form, 'subscriptions': subscriptions})

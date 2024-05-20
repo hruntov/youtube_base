@@ -4,11 +4,10 @@ import unittest
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-
 
 SELENIUM_SERVER_URL = os.environ.get('SELENIUM_SERVER_URL')
 MYWEBSITE_URL = os.environ.get("MYWEBSITE_URL")

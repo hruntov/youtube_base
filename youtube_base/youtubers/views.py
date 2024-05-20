@@ -1,5 +1,6 @@
 from django.contrib import messages
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,7 +15,7 @@ from taggit.models import Tag
 from youtube_api.add_youtuber import YoutubeApi
 
 from . import models
-from .forms import AddYoutuberForm, CategoryForm, CommentForm, TagForm, SearchForm
+from .forms import AddYoutuberForm, CategoryForm, CommentForm, SearchForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 
@@ -347,3 +348,25 @@ def youtuber_search(request):
                   {'form': form,
                    'query': query,
                    'results': results})
+
+
+@login_required
+def manage_subscribe(request, youtuber_id):
+    """
+    Handles the subscription and unsubscription of a user to a Youtuber.
+
+    Args:
+        request (HttpRequest): The request object.
+        youtuber_id (int): The ID of the Youtuber.
+
+    Returns:
+        HttpResponseRedirect: A redirect to the Youtuber's detail page.
+
+    """
+    youtuber = get_object_or_404(Youtuber, id=youtuber_id)
+    if youtuber in request.user.profile.subscriptions.all():
+        request.user.profile.subscriptions.remove(youtuber)
+    else:
+        request.user.profile.subscriptions.add(youtuber)
+
+    return redirect('youtuber_detail', slug_name=youtuber.slug_name)

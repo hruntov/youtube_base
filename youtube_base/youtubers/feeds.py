@@ -1,4 +1,5 @@
 import os
+
 import markdown
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
