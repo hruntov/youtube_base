@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from .models import Profile
+from youtubers.models import Youtuber
+
 
 class RegistrationTestCase(TestCase):
     def setUp(self):
@@ -53,3 +56,22 @@ class LogoutTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/')
         self.assertNotIn('_auth_user_id', self.client.session)
+
+
+class SubscriptionTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.profile = Profile.objects.create(user=self.user)
+        self.youtuber = Youtuber.objects.create(username='testyoutuber', slug_name='testyoutuber')
+        self.client.login(username='testuser', password='testpassword')
+
+    def test_subscription(self):
+        response = self.client.post(reverse('manage_subscribe', args=[self.youtuber.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.youtuber in self.user.profile.subscriptions.all())
+
+    def test_unsubscription(self):
+        self.user.profile.subscriptions.add(self.youtuber)
+        response = self.client.post(reverse('manage_subscribe', args=[self.youtuber.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(self.youtuber in self.user.profile.subscriptions.all())
