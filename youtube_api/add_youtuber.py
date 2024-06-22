@@ -40,20 +40,20 @@ class YoutubeApi:
         """
         return build('youtube', 'v3', developerKey=self.__api_key)
 
-    def __get_snippet_using_username(self, youtube, username):
+    def __get_snippet_using_channel_username(self, youtube, channel_username):
         """
-        Gets the snippet data for a YouTube channel using the username.
+        Gets the snippet data for a YouTube channel using the channel username.
 
         Args:
         youtube (googleapiclient.discovery.Resource): The service object YouTube object.
-        username (str): The username of the YouTube channel.
+        channel_username (str): The channel username of the YouTube channel.
 
         Returns:
         (dict): The snippet data of the YouTube channel.
 
         """
         return youtube.search().list(
-            q=username,
+            q=channel_username,
             part="snippet",
             type="channel",
             maxResults=1
@@ -76,9 +76,9 @@ class YoutubeApi:
             id=channel_id
         )
 
-    def __get_username_from_url(self, channel_url: str) -> str:
+    def __get_channel_username_from_url(self, channel_url: str) -> str:
         """
-        Gets the username from the channel URL and return it.
+        Gets the channel username from the channel URL and return it.
 
         Parameters:
         channel_url (str): The URL of the YouTube channel.
@@ -87,15 +87,15 @@ class YoutubeApi:
         parsed_url = urlparse(channel_url)
         if parsed_url.path.startswith("/@"):
             # Example: "https://www.youtube.com/@Google"
-            self.username = unquote(parsed_url.path[2:])
+            self.channel_username = unquote(parsed_url.path[2:])
             return
         elif parsed_url.path.startswith("/channel/"):
             # Example: "https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ"
-            self.username = unquote(parsed_url.path[9:])
+            self.channel_username = unquote(parsed_url.path[9:])
             return
         elif parsed_url.path.startswith("/c/"):
             # Example: "https://www.youtube.com/c/YouTubeCreators"
-            self.username = unquote(parsed_url.path[3:])
+            self.channel_username = unquote(parsed_url.path[3:])
             return
 
     def get_channel_data(self) -> dict:
@@ -106,12 +106,12 @@ class YoutubeApi:
         object based on the retrieved data.
 
         """
-        self.__get_username_from_url(self.channel_url)
+        self.__get_channel_username_from_url(self.channel_url)
 
-        if not self.username:
+        if not self.channel_username:
             return
         youtube = self.__build_youtube_service()
-        request = self.__get_snippet_using_username(youtube, self.username)
+        request = self.__get_snippet_using_channel_username(youtube, self.channel_username)
 
         response = request.execute()
         response_items = response.get('items', [])
