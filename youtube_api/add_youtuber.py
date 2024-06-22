@@ -88,15 +88,16 @@ class YoutubeApi:
         if parsed_url.path.startswith("/@"):
             # Example: "https://www.youtube.com/@Google"
             self.channel_username = unquote(parsed_url.path[2:])
-            return
+            return True
         elif parsed_url.path.startswith("/channel/"):
             # Example: "https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ"
             self.channel_username = unquote(parsed_url.path[9:])
-            return
+            return True
         elif parsed_url.path.startswith("/c/"):
             # Example: "https://www.youtube.com/c/YouTubeCreators"
             self.channel_username = unquote(parsed_url.path[3:])
-            return
+            return True
+        return False
 
     def get_channel_data(self) -> dict:
         """
@@ -106,23 +107,21 @@ class YoutubeApi:
         object based on the retrieved data.
 
         """
-        self.__get_channel_username_from_url(self.channel_url)
-
-        if not self.channel_username:
-            return
-        youtube = self.__build_youtube_service()
-        request = self.__get_snippet_using_channel_username(youtube, self.channel_username)
-
-        response = request.execute()
-        response_items = response.get('items', [])
-        if response_items:
-            self.channel_id = response_items[0]['id']['channelId']
-            self.channel_title = response_items[0]['snippet']['title']
-
-            request = self.__get_snippet_using_id(youtube, self.channel_id)
+        if self.__get_channel_username_from_url(self.channel_url):
+            if not self.channel_username:
+                return False
+            youtube = self.__build_youtube_service()
+            request = self.__get_snippet_using_channel_username(youtube, self.channel_username)
             response = request.execute()
             response_items = response.get('items', [])
             if response_items:
-                self.channel_description = response_items[0]['snippet']['description']
-        else:
-            print("Url not correct.")
+                self.channel_id = response_items[0]['id']['channelId']
+                self.channel_title = response_items[0]['snippet']['title']
+
+                request = self.__get_snippet_using_id(youtube, self.channel_id)
+                response = request.execute()
+                response_items = response.get('items', [])
+                if response_items:
+                    self.channel_description = response_items[0]['snippet']['description']
+            return True
+        return False
