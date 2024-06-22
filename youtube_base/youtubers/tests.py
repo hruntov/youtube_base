@@ -4,7 +4,7 @@ from django.core.paginator import Page, Paginator
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from .forms import CommentForm
+from .forms import AddYoutuberForm, CommentForm
 from .models import Category, Comment, Youtuber
 from .views import CommentAddView, YoutuberDetailView, YoutuberList
 
@@ -82,3 +82,34 @@ class YoutuberDetailViewTest(TestCase):
         response = view(request, slug_name=self.youtuber.slug_name)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 0)
+
+
+class AddYoutuberViewTests(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name='Test Category')
+        self.existing_youtuber = Youtuber.objects.create(
+            channel_id="UC_x5XG1OV2P6uZZ5FSM9Ttw",
+            channel_title="Test Channel",
+            username="testuser",
+            channel_description="Test Description",
+            youtube_url="https://www.youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw",
+            slug_name="testuser"
+        )
+
+    def test_add_duplicate_youtuber(self):
+        form_data = {
+            'youtube_url': 'https://www.youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw',
+            'categories': [self.category.id]
+        }
+        form = AddYoutuberForm(data=form_data)
+
+        if not form.is_valid():
+            print(form.errors)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('add_youtuber'), form_data)
+
+        youtubers_count = Youtuber.objects.filter(channel_id="UC_x5XG1OV2P6uZZ5FSM9Ttw").count()
+        self.assertEqual(youtubers_count, 1)
+
+        self.assertContains(response, 'Такий ютубер вже існує на нашому сайті.')

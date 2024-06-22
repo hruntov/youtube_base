@@ -1,5 +1,21 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Youtuber</button>
-</form>
+{% extends "base.html" %}
+
+{% block title %}
+    <title>Додати Ютубера</title>
+{% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Додати ютубера</button>
+    </form>
+{% endblock %}
