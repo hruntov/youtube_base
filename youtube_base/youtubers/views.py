@@ -89,20 +89,22 @@ class AddYoutuberView(FormView):
         url = form.cleaned_data['youtube_url']
         categories = form.cleaned_data['categories']
         youtube_channel = YoutubeApi(url)
-        youtube_channel.get_channel_data()
+        if youtube_channel.get_channel_data():
+            youtuber = Youtuber(
+                channel_id=youtube_channel.channel_id,
+                channel_title=youtube_channel.channel_title,
+                username=youtube_channel.channel_username,
+                channel_description=youtube_channel.channel_description,
+                youtube_url=youtube_channel.channel_url,
+                slug_name=slugify(youtube_channel.channel_username)
+            )
+            youtuber.save()
+            youtuber.categories.set(categories)
+            messages.success(self.request, 'Ютубер успішно доданий до бази даних.')
+            return super().form_valid(form)
 
-        youtuber = Youtuber(
-            channel_id=youtube_channel.channel_id,
-            channel_title=youtube_channel.channel_title,
-            username=youtube_channel.channel_username,
-            channel_description=youtube_channel.channel_description,
-            youtube_url=youtube_channel.channel_url,
-            slug_name=slugify(youtube_channel.channel_username)
-        )
-        youtuber.save()
-        youtuber.categories.set(categories)
-
-        return super().form_valid(form)
+        form.add_error(None, 'За таким посиланням ютубера не було знайдено.')
+        return self.form_invalid(form)
 
 
 class CategoryList(BaseCategoryMixin, ListView):
