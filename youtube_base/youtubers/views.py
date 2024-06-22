@@ -94,10 +94,10 @@ class AddYoutuberView(FormView):
         youtuber = Youtuber(
             channel_id=youtube_channel.channel_id,
             channel_title=youtube_channel.channel_title,
-            username=youtube_channel.username,
+            username=youtube_channel.channel_username,
             channel_description=youtube_channel.channel_description,
             youtube_url=youtube_channel.channel_url,
-            slug_name=slugify(youtube_channel.username)
+            slug_name=slugify(youtube_channel.channel_username)
         )
         youtuber.save()
         youtuber.categories.set(categories)
