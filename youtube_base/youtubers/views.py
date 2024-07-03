@@ -19,6 +19,8 @@ from . import models
 from .forms import AddYoutuberForm, CategoryForm, CommentForm, SearchForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
+from youtube_base.actions.utils import create_action
+from youtube_base.actions.models import Action
 
 
 class TestTemplateView(TemplateView):
@@ -40,7 +42,7 @@ class BaseCategoryMixin:
 
     """
     def get_context_data(self, **kwargs):
-        """Enhances the context with category data.
+        """Enhances the context with category and actions data.
 
         Returns:
             (dict): The context data.
@@ -48,12 +50,14 @@ class BaseCategoryMixin:
         """
         context = super().get_context_data(**kwargs)
         categories = cache.get('all_categories')
+        actions = Action.objects.all().order_by('-created')[:10]
 
         if categories is None:
             categories = list(Category.objects.all())
             cache.set('all_categories', categories)
 
         context['categories'] = categories
+        context['actions'] = actions
         return context
 
 
@@ -112,6 +116,9 @@ class AddYoutuberView(FormView):
                 slug_name=slugify(youtube_channel.channel_username)
             )
             youtuber.save()
+
+            create_action(self.request.user, f'Доданий канал {youtuber}', youtuber)
+
             youtuber.categories.set(categories)
             messages.success(self.request, 'Ютубер успішно доданий до бази даних.')
             return super().form_valid(form)
