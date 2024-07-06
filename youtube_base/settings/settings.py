@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from curses.ascii import EM
 from pathlib import Path
+import sys
 
 from dotenv import load_dotenv
 
@@ -50,14 +51,15 @@ INSTALLED_APPS = [
 
     'crispy_bootstrap4',
     'crispy_forms',
-    'youtubers',
-    'users',
-    'youtube_base.actions',
+    'easy_thumbnails',
+    'django_extensions',
+    'social_django',
     'rest_framework',
     'taggit',
-    'social_django',
-    'django_extensions',
-    'easy_thumbnails',
+
+    'users',
+    'youtubers',
+    'youtube_base.actions',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -95,6 +97,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
 
 ROOT_URLCONF = 'settings.urls'
 
@@ -191,3 +201,15 @@ EMAIL_USE_TLS = True
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+TESTING = "test" in sys.argv
+
+if not TESTING and 'SELENIUM_TESTS' not in os.environ:
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+        *MIDDLEWARE,
+    ]
