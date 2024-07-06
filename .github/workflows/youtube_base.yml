@@ -29,8 +29,8 @@ jobs:
       - name: Build and run Docker containers
         run: docker-compose up -d
 
-      - name: Execute tests
-        run: docker-compose exec -T mywebsite poetry run pytest -v --reruns 5
+      - name: Execute func tests
+        run: docker-compose exec -T mywebsite /bin/bash -c "export SELENIUM_TESTS=1 && poetry run pytest -v --reruns 5"
 
       - name: Run users unit tests
         run: docker-compose exec -T mywebsite poetry run python youtube_base/manage.py test users

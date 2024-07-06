@@ -51,7 +51,6 @@ INSTALLED_APPS = [
 
     'crispy_bootstrap4',
     'crispy_forms',
-    'debug_toolbar',
     'easy_thumbnails',
     'django_extensions',
     'social_django',
@@ -90,7 +89,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -206,7 +204,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 TESTING = "test" in sys.argv
 
-if not TESTING:
+if not TESTING and 'SELENIUM_TESTS' not in os.environ:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
