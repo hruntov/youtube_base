@@ -67,9 +67,20 @@ services:
     volumes:
     - .:/website_wsl
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - mynetwork
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
 networks:
   mynetwork:
     driver: bridge
 
 volumes:
   postgres_data:
+  redis_data:

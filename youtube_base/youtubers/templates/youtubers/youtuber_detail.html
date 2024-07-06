@@ -15,6 +15,9 @@
           </form>
         {% endif %}
         <h1 class="card-title">{{ youtuber.channel_title }}</h1>
+        <span>
+          {{ total_views }} переглядів
+        </span>
         <p class="tags">Tags:
           {% for tag in youtuber.tags.all %}
               <form method="post" id="tag" action="{% url 'youtuber_list' %}">
