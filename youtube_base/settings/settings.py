@@ -50,14 +50,15 @@ INSTALLED_APPS = [
 
     'crispy_bootstrap4',
     'crispy_forms',
-    'youtubers',
-    'users',
-    'youtube_base.actions',
+    'easy_thumbnails',
+    'django_extensions',
+    'social_django',
     'rest_framework',
     'taggit',
-    'social_django',
-    'django_extensions',
-    'easy_thumbnails',
+
+    'users',
+    'youtubers',
+    'youtube_base.actions',
 ]
 
 AUTHENTICATION_BACKENDS = [
