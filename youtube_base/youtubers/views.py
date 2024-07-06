@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
@@ -11,6 +12,8 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
+
+import redis
 from taggit.models import Tag
 
 from youtube_api.add_youtuber import YoutubeApi
@@ -21,6 +24,9 @@ from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
 from youtube_base.actions.utils import create_action
 from youtube_base.actions.models import Action
+
+
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 
 class TestTemplateView(TemplateView):
@@ -289,6 +295,8 @@ class YoutuberDetailView(DetailView):
         context['form'] = CommentForm()
         context['comments'] = Comment.objects.filter(youtuber=context['youtuber']).order_by('-created_at')[:5]
         context['tag_form'] = TagForm()
+        redis_key = f'youtuber:{self.object.id}:views'
+        context['total_views'] = r.incr(redis_key)
         return context
 
 
