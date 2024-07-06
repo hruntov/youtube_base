@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -18,6 +19,8 @@ from . import models
 from .forms import AddYoutuberForm, CategoryForm, CommentForm, SearchForm, TagForm
 from .models import Category, Comment, Youtuber
 from .serialaizer import YoutuberSerializer
+from youtube_base.actions.utils import create_action
+from youtube_base.actions.models import Action
 
 
 class TestTemplateView(TemplateView):
@@ -39,7 +42,7 @@ class BaseCategoryMixin:
 
     """
     def get_context_data(self, **kwargs):
-        """Enhances the context with category data.
+        """Enhances the context with category and actions data.
 
         Returns:
             (dict): The context data.
@@ -47,12 +50,14 @@ class BaseCategoryMixin:
         """
         context = super().get_context_data(**kwargs)
         categories = cache.get('all_categories')
+        actions = Action.objects.all().order_by('-created')[:10]
 
         if categories is None:
             categories = list(Category.objects.all())
             cache.set('all_categories', categories)
 
         context['categories'] = categories
+        context['actions'] = actions
         return context
 
 
@@ -85,24 +90,41 @@ class AddYoutuberView(FormView):
     form_class = AddYoutuberForm
     success_url = reverse_lazy('add_youtuber')
 
+    def youtuber_exists(self, channel_id):
+        """Checks if a Youtuber with the same channel_id already exists in the database."""
+        try:
+            Youtuber.objects.get(channel_id=channel_id)
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def form_valid(self, form):
         url = form.cleaned_data['youtube_url']
         categories = form.cleaned_data['categories']
         youtube_channel = YoutubeApi(url)
-        youtube_channel.get_channel_data()
+        if youtube_channel.get_channel_data():
+            if self.youtuber_exists(youtube_channel.channel_id):
+                form.add_error(None, 'Такий ютубер вже існує на нашому сайті.')
+                return self.form_invalid(form)
 
-        youtuber = Youtuber(
-            channel_id=youtube_channel.channel_id,
-            channel_title=youtube_channel.channel_title,
-            username=youtube_channel.username,
-            channel_description=youtube_channel.channel_description,
-            youtube_url=youtube_channel.channel_url,
-            slug_name=slugify(youtube_channel.username)
-        )
-        youtuber.save()
-        youtuber.categories.set(categories)
+            youtuber = Youtuber(
+                channel_id=youtube_channel.channel_id,
+                channel_title=youtube_channel.channel_title,
+                username=youtube_channel.channel_username,
+                channel_description=youtube_channel.channel_description,
+                youtube_url=youtube_channel.channel_url,
+                slug_name=slugify(youtube_channel.channel_username)
+            )
+            youtuber.save()
 
-        return super().form_valid(form)
+            create_action(self.request.user, f'Доданий канал {youtuber}', youtuber)
+
+            youtuber.categories.set(categories)
+            messages.success(self.request, 'Ютубер успішно доданий до бази даних.')
+            return super().form_valid(form)
+
+        form.add_error(None, 'За таким посиланням ютубера не було знайдено.')
+        return self.form_invalid(form)
 
 
 class CategoryList(BaseCategoryMixin, ListView):

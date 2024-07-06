@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'youtubers',
     'users',
+    'youtube_base.actions',
     'rest_framework',
     'taggit',
     'social_django',

@@ -1,0 +1,14 @@
+<div class="container">
+    <div class="actions">
+        <h2>Recent Actions</h2>
+        <ul class="list-group">
+            {% for action in actions %}
+                <li class="list-group-item">
+                    {{ action.user.username }}: {{ action.action }} - {{ action.created }}
+                </li>
+            {% empty %}
+                <li class="list-group-item">No recent actions.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
